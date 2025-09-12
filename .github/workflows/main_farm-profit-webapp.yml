@@ -34,7 +34,7 @@ jobs:
           context: .
           push: true
           tags: gigahackhakaton2025shifthappens.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_7C470895156F49E3A098D7986DDE9B07 }}/farmprofitapp:${{ github.sha }}
-          file: ./Dockerfile
+          file: ./FarmProfit/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
