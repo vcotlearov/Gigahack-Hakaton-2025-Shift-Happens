@@ -36,12 +36,13 @@ namespace FarmProfit.API
 
 			var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+			// Configure the HTTP request pipeline.
 
-            app.UseAuthorization();
+			app.UseAuthentication(); // must come BEFORE UseAuthorization
+			app.UseAuthorization();
 
 
-            app.MapControllers();
+			app.MapControllers();
 
             app.Run();
         }
