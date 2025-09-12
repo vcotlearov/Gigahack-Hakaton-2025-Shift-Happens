@@ -11,16 +11,17 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["FarmProfit.API/FarmProfit.API.csproj", "FarmProfit.API/"]
-RUN dotnet restore "./FarmProfit.API/FarmProfit.API.csproj"
-COPY . .
-WORKDIR "/src/FarmProfit.API"
-RUN dotnet build "./FarmProfit.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+COPY FarmProfit/FarmProfit.API/*.csproj ./FarmProfit.API/
+WORKDIR /src/FarmProfit.API
+RUN dotnet restore
+
+COPY FarmProfit/FarmProfit.API/. ./FarmProfit.API/
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./FarmProfit.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
