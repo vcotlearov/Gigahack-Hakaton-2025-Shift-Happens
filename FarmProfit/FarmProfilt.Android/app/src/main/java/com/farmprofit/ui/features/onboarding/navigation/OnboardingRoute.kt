@@ -7,9 +7,3 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 object OnboardingRoute
-
-fun NavGraphBuilder.onboardingScreen() {
-    composable<OnboardingRoute> {
-        OnboardingScreen()
-    }
-}

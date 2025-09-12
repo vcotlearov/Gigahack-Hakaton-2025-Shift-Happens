@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt)
+    id("kotlin-kapt")
 }
 
 android {
@@ -59,4 +61,22 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.ui.text.google.fonts)
+
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+
+    // Google Maps Platform for Android
+    implementation(libs.play.services.maps)
+
+// Google Maps Compose library
+    implementation(libs.maps.compose)
+// Import for the GeoJson library (optional, we will create a helper function instead)
+
+// For using the Storage Access Framework (SAF)
+    implementation(libs.androidx.activity.ktx)
+
+    implementation(libs.kotlinx.serialization.json)
+
+
 }
