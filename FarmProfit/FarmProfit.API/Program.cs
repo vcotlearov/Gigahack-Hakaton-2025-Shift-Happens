@@ -43,8 +43,8 @@ namespace FarmProfit.API
 					{
 						ValidateIssuer = false,
 						ValidateAudience = false,
-						ValidateIssuerSigningKey = false,
-						ValidateLifetime = false,
+						ValidateIssuerSigningKey = true,
+						ValidateLifetime = true,
 						ValidIssuer = $"https://{domain}/",
 						ValidAudience = audience
 					};
