@@ -39,15 +39,15 @@ namespace FarmProfit.API
 				{
 					options.Authority = $"https://{domain}/";
 					options.Audience = audience;
-					/*options.TokenValidationParameters = new TokenValidationParameters
+					options.TokenValidationParameters = new TokenValidationParameters
 					{
-						ValidateIssuer = true,
-						ValidateAudience = true,
-						ValidateIssuerSigningKey = true,
-						ValidateLifetime = true,
+						ValidateIssuer = false,
+						ValidateAudience = false,
+						ValidateIssuerSigningKey = false,
+						ValidateLifetime = false,
 						ValidIssuer = $"https://{domain}/",
 						ValidAudience = audience
-					};*/
+					};
 				});
 
 			// Add Authorization if needed
