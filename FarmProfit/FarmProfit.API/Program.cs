@@ -1,5 +1,5 @@
-using Auth0.AspNetCore.Authentication;
 using FarmProfit.API.Contexts;
+using FarmProfit.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +22,7 @@ namespace FarmProfit.API
 				.ReadFrom.Configuration(builder.Configuration)
 				.ReadFrom.Services(services)
 				.Enrich.FromLogContext());
+
 			builder.Services.AddControllers();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -49,17 +50,14 @@ namespace FarmProfit.API
 					};
 				});
 
-			// Add Authorization if needed
 			builder.Services.AddAuthorization();
 			builder.Services.AddHttpClient();
 
 			var app = builder.Build();
 
-			// Configure the HTTP request pipeline.
-
-			app.UseAuthentication(); // must come BEFORE UseAuthorization
+			app.UseAuthentication();
 			app.UseAuthorization();
-
+			app.UseMiddleware<UserProvisioningMiddleware>();
 
 			app.MapControllers();
 
