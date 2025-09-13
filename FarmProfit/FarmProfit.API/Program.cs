@@ -3,6 +3,7 @@ using FarmProfit.API.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace FarmProfit.API
 {
@@ -10,9 +11,18 @@ namespace FarmProfit.API
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+	        Log.Logger = new LoggerConfiguration()
+		        .Enrich.FromLogContext()
+		        .WriteTo.Console()
+		        .CreateBootstrapLogger();
 
-            builder.Services.AddControllers();
+			var builder = WebApplication.CreateBuilder(args);
+
+			builder.Services.AddSerilog((services, lc) => lc
+				.ReadFrom.Configuration(builder.Configuration)
+				.ReadFrom.Services(services)
+				.Enrich.FromLogContext());
+			builder.Services.AddControllers();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
 	            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

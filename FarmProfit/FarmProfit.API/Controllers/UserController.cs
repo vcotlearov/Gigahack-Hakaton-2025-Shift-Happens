@@ -18,7 +18,7 @@ public class UserRegistrationRequest
 
 [ApiController]
 [Route("api/users")]
-public class UsersController(AppDbContext db, HttpClient httpClient) : ControllerBase
+public class UsersController(AppDbContext db, HttpClient httpClient, ILogger<UsersController> logger) : ControllerBase
 {
 	private readonly string _auth0Domain = "dev-iqadq0gbmsvx3bju.us.auth0.com";
 
@@ -42,19 +42,33 @@ public class UsersController(AppDbContext db, HttpClient httpClient) : Controlle
 		var response = await httpClient.SendAsync(httpRequest);
 		if (response.IsSuccessStatusCode)
 		{
-
-			var user = new User
+			try
 			{
-				Name = request.Name,
-				Phone = request.Phone,
-				CreatedAt = DateTime.UtcNow
-			};
+				var user = new User
+				{
+					Name = request.Name,
+					Phone = request.Phone,
+					CreatedAt = DateTime.UtcNow
+				};
 
-			db.Users.Add(user);
-			await db.SaveChangesAsync();
+				logger.LogInformation("Saving user to our DB");
+				db.Users.Add(user);
+				await db.SaveChangesAsync();
+				logger.LogInformation("User is saved");
 
-			return Ok(user);
-			return Ok("User registered");
+				return Ok(new
+				{
+					user.Id,
+					user.Name,
+					user.Phone,
+					user.CreatedAt
+				});
+			}
+			catch (Exception ex)
+			{
+				logger.LogError($"Error during save: {ex.Message}");
+				return BadRequest(ex.Message);
+			}
 		}
 
 		var error = await response.Content.ReadAsStringAsync();
