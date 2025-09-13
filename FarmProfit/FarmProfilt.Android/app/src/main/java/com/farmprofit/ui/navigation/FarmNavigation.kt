@@ -19,11 +19,18 @@ import com.farmprofit.ui.features.register.navigation.registerScreen
 @Composable
 fun FarmNavigation(
     navController: NavHostController,
+    isLoggedIn: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val startDestination = if (isLoggedIn) {
+        HomeScreenRoute
+    } else {
+        OnboardingGraphRoute
+    }
+
     NavHost(
         navController = navController,
-        startDestination = OnboardingGraphRoute,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         navigation<OnboardingGraphRoute>(startDestination = OnboardingRoute) {

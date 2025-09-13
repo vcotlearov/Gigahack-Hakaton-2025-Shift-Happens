@@ -29,7 +29,9 @@ fun NiaNavigationSuiteScaffold(
         },
         layoutType = layoutType,
         containerColor = Color.Transparent,
-        navigationSuiteColors = NavigationSuiteDefaults.colors(),
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationBarContainerColor = Color.White
+        ),
         modifier = modifier,
     ) {
         content()

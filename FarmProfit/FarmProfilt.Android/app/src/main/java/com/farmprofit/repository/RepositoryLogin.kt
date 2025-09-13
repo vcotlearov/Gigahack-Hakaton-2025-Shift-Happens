@@ -12,8 +12,7 @@ class RepositoryLogin @Inject constructor(
     }
 
     suspend fun isLoggedIn(): Boolean {
-        val token = localDataSource.getAccessToken()
-        return !token.isNullOrEmpty()
+        return localDataSource.isLoggedIn()
     }
 
 }

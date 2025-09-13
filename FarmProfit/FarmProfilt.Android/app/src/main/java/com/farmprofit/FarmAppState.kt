@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -15,11 +14,10 @@ import androidx.navigation.navOptions
 import com.farmprofit.ui.features.dashboard.navigation.navigateToDashboard
 import com.farmprofit.ui.features.home.navigation.navigateToHome
 import com.farmprofit.ui.navigation.TopLevelDestination
-import kotlin.reflect.KClass
 
 @Stable
 class FarmAppState(
-    val navController: NavHostController
+    val navController: NavHostController,
 ) {
     private val previousDestination = mutableStateOf<NavDestination?>(null)
     var isTopLevelDestination = mutableStateOf(false)
@@ -90,8 +88,3 @@ fun rememberFarmAppState(
         state
     }
 }
-
-private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
-    this?.hierarchy?.any {
-        it.hasRoute(route)
-    } ?: false

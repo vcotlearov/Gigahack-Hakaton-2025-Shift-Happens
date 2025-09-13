@@ -5,8 +5,7 @@ import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 
 fun WindowAdaptiveInfo.isCompact(): Boolean {
-    return windowPosture.isTabletop ||
-            windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT
+    return windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
 }
 
 fun WindowAdaptiveInfo.isExpanded(): Boolean {

@@ -21,7 +21,7 @@ enum class TopLevelDestination(
     ),
     DASHBOARD(
         icon = Icons.Default.Home,
-        titleTextId = R.string.dashboard,
+        titleTextId = R.string.home,
         route = DashboardRoute::class
     ),
 }

@@ -17,5 +17,5 @@ fun NavGraphBuilder.dashboardScreen(navigateToLand: () -> Unit) {
 }
 
 fun NavController.navigateToDashboard(navOptions: NavOptions) {
-    this.navigate(DashboardRoute::class, navOptions)
+    this.navigate(DashboardRoute, navOptions)
 }

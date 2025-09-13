@@ -14,18 +14,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
+import com.farmprofit.ui.MainViewModel
 import com.farmprofit.ui.navigation.FarmNavigation
 import com.farmprofit.ui.navigation.components.NiaNavigationSuiteScaffold
 import com.farmprofit.ui.theme.FarmProfitTheme
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
 @Composable
@@ -34,6 +40,10 @@ fun MainApp() {
     val windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo()
     val currentDestination = appState.currentDestination
     val isTopLevelDestination by appState.isTopLevelDestination
+    val mainViewModel = hiltViewModel<MainViewModel>()
+
+    val isLoggedIn by mainViewModel.isLoggedIn.collectAsStateWithLifecycle()
+
     FarmProfitTheme {
         if (isTopLevelDestination) {
             NiaNavigationSuiteScaffold(
@@ -60,23 +70,25 @@ fun MainApp() {
                 },
                 windowAdaptiveInfo = windowAdaptiveInfo,
             ) {
-                FarmMainContent(appState.navController)
+                FarmMainContent(appState.navController, isLoggedIn)
             }
         } else {
-            FarmMainContent(appState.navController)
+            FarmMainContent(appState.navController, isLoggedIn)
         }
     }
 }
 
 @Composable
 private fun FarmMainContent(
-    navController: NavHostController
+    navController: NavHostController,
+    isLoggedIn: Boolean
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { padding ->
         FarmNavigation(
             navController = navController,
+            isLoggedIn = isLoggedIn,
             modifier = Modifier.fillMaxSize()
                 .padding(padding)
                 .consumeWindowInsets(padding)

@@ -17,5 +17,5 @@ fun NavGraphBuilder.homeScreen() {
 }
 
 fun NavController.navigateToHome(navOptions: NavOptions) {
-    this.navigate(HomeScreenRoute::class, navOptions)
+    this.navigate(HomeScreenRoute, navOptions)
 }

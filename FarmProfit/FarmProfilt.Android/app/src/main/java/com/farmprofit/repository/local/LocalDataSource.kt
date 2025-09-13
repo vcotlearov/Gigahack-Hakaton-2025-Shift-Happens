@@ -9,6 +9,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -27,10 +29,9 @@ class LocalDataSource @Inject constructor(
         }
     }
 
-    suspend fun getAccessToken(): String? {
+    suspend fun isLoggedIn(): Boolean {
         val preferenceKey = stringPreferencesKey(ACCESS_TOKEN)
-        val preferences = context.dataStore.data.map { it[preferenceKey] }.firstOrNull()
-        return preferences
+        return context.dataStore.data.map { it[preferenceKey] != null }.firstOrNull() ?: false
     }
 
     companion object {

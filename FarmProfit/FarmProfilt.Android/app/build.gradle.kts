@@ -21,7 +21,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders.put("auth0Domain", "@string/com_auth0_domain")
-        manifestPlaceholders.put("auth0Scheme", "https")
+        manifestPlaceholders.put("auth0Scheme", "demo")
     }
 
     buildTypes {
