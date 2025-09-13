@@ -32,8 +32,15 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     boxShadow:
-                        '0px 2px 4px rgba(0,0,0,0.04), 0px 8px 24px rgba(0,0,0,0.08)',
+                        '0px 1px 1px rgba(0,0,0,0.04), 0px 1px 1px rgba(0,0,0,0.08)',
                     borderRadius: 6,
+                },
+            },
+        },
+        MuiInputBase: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 1, // Multiplies by theme.shape.borderRadius (default 4px), resulting in 8px
                 },
             },
         },

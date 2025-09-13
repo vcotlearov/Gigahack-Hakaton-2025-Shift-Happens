@@ -244,7 +244,7 @@ export default function MapFieldsArea() {
                         fontSize: 14,
                     }}
                 >
-                    Итого: <b>{totalHa}</b> ha
+                    Total surface: <b>{totalHa}</b> ha
                 </div>
             </div>
 
