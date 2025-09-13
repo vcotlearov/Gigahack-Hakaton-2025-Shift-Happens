@@ -30,7 +30,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 				}));
 
 		modelBuilder.Entity<Businesses>()
-			.HasOne(b => b.Contact)
+			.HasOne(b => b.Contract)
 			.WithOne(c => c.Business)
 			.HasForeignKey<Contacts>(c => c.BusinessId)
 			.OnDelete(DeleteBehavior.Cascade);

@@ -22,7 +22,7 @@ namespace FarmProfit.API.Middleware
 						user = new User
 						{
 							Auth0Id = sub,
-							Email = email ?? "unknown@example.com",
+							Email = email ?? "unknown@farmprofit",
 							CreatedAt = DateTime.UtcNow
 						};
 						db.Users.Add(user);
