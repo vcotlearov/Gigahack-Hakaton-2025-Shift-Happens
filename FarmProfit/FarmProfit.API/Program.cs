@@ -29,6 +29,7 @@ namespace FarmProfit.API
 
             var domain = "dev-iqadq0gbmsvx3bju.us.auth0.com";// builder.Configuration["Auth0:Domain"]!;
             var audience = "https://farm-profit-webapp.azurewebsites.net";// builder.Configuration["Auth0:Audience"]!;
+         //   var audience = "http://localhost:5233";// builder.Configuration["Auth0:Audience"]!;
 
 			builder.Services.AddAuthentication(options =>
 				{
