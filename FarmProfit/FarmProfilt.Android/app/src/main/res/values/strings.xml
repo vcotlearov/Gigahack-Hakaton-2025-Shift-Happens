@@ -9,4 +9,6 @@
     <string name="idno">IDNO: </string>
     <string name="active_assets">Active assets: </string>
     <string name="current_balance">Current balance: </string>
+
+    <string name="scan_qr_code_instructions">Scan the QR code at a partner store to use your balance.\nIf the scan doesn’t work, you can enter the code manually.</string>
 </resources>

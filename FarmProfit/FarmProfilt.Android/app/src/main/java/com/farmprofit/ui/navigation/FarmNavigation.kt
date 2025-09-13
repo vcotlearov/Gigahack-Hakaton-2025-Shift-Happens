@@ -9,6 +9,8 @@ import androidx.navigation.compose.navigation
 import com.farmprofit.ui.features.dashboard.navigation.dashboardScreen
 import com.farmprofit.ui.features.home.navigation.HomeScreenRoute
 import com.farmprofit.ui.features.home.navigation.homeScreen
+import com.farmprofit.ui.features.home.qr_code_scan.navigation.navigateToQrCodePartners
+import com.farmprofit.ui.features.home.qr_code_scan.navigation.qrCodePartnersScreen
 import com.farmprofit.ui.features.login.navigation.loginScreen
 import com.farmprofit.ui.features.maplandselection.MapLandSelectionScreen
 import com.farmprofit.ui.features.maplandselection.navigation.LandSelectionRoute
@@ -55,6 +57,11 @@ fun FarmNavigation(
         }
 
         dashboardScreen { navController.navigate(LandSelectionRoute) }
-        homeScreen()
+        homeScreen(
+            navigateToQrCodePartners =  {
+                navController.navigateToQrCodePartners()
+            }
+        )
+        qrCodePartnersScreen()
     }
 }

@@ -1,6 +1,7 @@
 package com.farmprofit.ui.features.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import com.farmprofit.ui.theme.FarmProfitTheme
 @Composable
 fun OrganizationCard(
     organization: Organization,
+    onQrCodeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -138,7 +140,10 @@ fun OrganizationCard(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                    .size(48.dp),
+                    .size(48.dp)
+                    .clickable {
+                        onQrCodeClick()
+                    },
             ) {
                 Icon(
                     modifier = Modifier.padding(8.dp),
@@ -176,7 +181,7 @@ fun OrganizationCardPreview() {
                 isVerifiedByAipa = true,
                 farmLevel = "Gold",
             )
-            OrganizationCard(organization)
+            OrganizationCard(organization, onQrCodeClick = {})
             Spacer(modifier = Modifier.width(8.dp))
         }
     }

@@ -10,9 +10,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 object HomeScreenRoute
 
-fun NavGraphBuilder.homeScreen() {
+fun NavGraphBuilder.homeScreen(navigateToQrCodePartners: () -> Unit) {
     composable<HomeScreenRoute> {
-        HomeScreen()
+        HomeScreen(navigateToQrCodePartners)
     }
 }
 

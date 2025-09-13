@@ -23,7 +23,9 @@ import com.farmprofit.ui.utils.isCompact
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navigateToQrCodePartners: () -> Unit
+) {
     val viewModel = hiltViewModel<HomeViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val windowInfo = currentWindowAdaptiveInfo()
@@ -32,15 +34,14 @@ fun HomeScreen() {
         TopAppBar(
             title = {
                 Text(text = "My Businesses")
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
+            }, colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent
-            ),
-            modifier = Modifier
+            ), modifier = Modifier
         )
 
         LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(horizontal = 16.dp),
             columns = if (windowInfo.isCompact()) {
                 GridCells.Fixed(1)
@@ -52,7 +53,10 @@ fun HomeScreen() {
         ) {
             items(state.organizations.size) { index ->
                 val organization = state.organizations[index]
-                OrganizationCard(organization)
+                OrganizationCard(
+                    organization = organization, onQrCodeClick = {
+                        navigateToQrCodePartners()
+                    })
             }
         }
     }
