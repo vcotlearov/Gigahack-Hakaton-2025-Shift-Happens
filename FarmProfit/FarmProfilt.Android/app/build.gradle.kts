@@ -68,15 +68,14 @@ dependencies {
 
     // Google Maps Platform for Android
     implementation(libs.play.services.maps)
-
-// Google Maps Compose library
     implementation(libs.maps.compose)
-// Import for the GeoJson library (optional, we will create a helper function instead)
-
-// For using the Storage Access Framework (SAF)
     implementation(libs.androidx.activity.ktx)
 
     implementation(libs.kotlinx.serialization.json)
-
+    // adaptive
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.material3.navigationSuite)
 
 }
