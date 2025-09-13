@@ -1,15 +1,21 @@
+// src/auth/WelcomeCard.tsx
+import * as React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import {
     Box, Paper, Stack, Typography, Button, Link as MuiLink
 } from '@mui/material';
+import { useHistory } from 'react-router-dom';
 import { Logo } from '../logo/Logo';
 
-type WelcomeCardProps = {
-    createAccountAction: () => void;
-    loginAction: () => void;
-};
+export default function WelcomeCard() {
+    const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+    const history = useHistory();
 
+    // Если уже залогинен — отправляем в приложение
+    React.useEffect(() => {
+        if (isAuthenticated) history.replace('/my-businesses');
+    }, [isAuthenticated, history]);
 
-export default function WelcomeCard({ createAccountAction, loginAction }: WelcomeCardProps) {
     return (
         <Box
             sx={{
@@ -24,7 +30,7 @@ export default function WelcomeCard({ createAccountAction, loginAction }: Welcom
                 elevation={0}
                 sx={{
                     width: 462,
-                    height: 329,                  // карточка как в макете
+                    height: 329,
                     maxWidth: '92vw',
                     p: 4,
                 }}
@@ -33,7 +39,7 @@ export default function WelcomeCard({ createAccountAction, loginAction }: Welcom
 
                 {/* Заголовок + сабтекст */}
                 <Stack alignItems="center" textAlign="center" spacing={2} mb={3} mt={3}>
-                    <Typography variant="h5" sx={{ fontWeight: 600 }} >
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
                         Welcome to FarmProfit!
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'text.secondary' }}>
@@ -44,21 +50,29 @@ export default function WelcomeCard({ createAccountAction, loginAction }: Welcom
                 {/* Кнопки */}
                 <Stack spacing={4} alignItems="stretch">
                     <Button
-                        onClick={loginAction}
+                        onClick={() =>
+                            loginWithRedirect({
+                                appState: { returnTo: '/my-businesses' }, // после логина
+                            })
+                        }
                         variant="contained"
                         size="large"
                         fullWidth
                         aria-label="Log In"
+                        disabled={isLoading}
                     >
                         Log In
                     </Button>
 
                     <MuiLink
-                        // href="#create-account"
-                        onClick={createAccountAction}
+                        onClick={() =>
+                            loginWithRedirect({
+                                appState: { returnTo: '/register-profile' } // после регистрации
+                            })
+                        }
                         underline="none"
                         textAlign="center"
-                        sx={{ fontWeight: 500, color: 'primary.main' }}
+                        sx={{ fontWeight: 500, color: 'primary.main', cursor: 'pointer' }}
                     >
                         Create New Account
                     </MuiLink>

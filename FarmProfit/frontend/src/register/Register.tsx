@@ -8,6 +8,7 @@ import {
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { useHistory, useParams } from 'react-router-dom';
+import { useApi } from '../lib/api';
 
 // ---------- ТИПЫ ДАННЫХ (payload «на бэк»)
 type LegalForm = 'SRL' | 'II' | 'GȚ' | '';
@@ -28,9 +29,11 @@ export interface BusinessPayload {
 // ---------- СТЕЙТ ФОРМЫ (как у тебя)
 
 export const Register = () => {
+    const { fetchApi } = useApi();
     const history = useHistory();
     const { index } = useParams<{ index?: string }>();
 
+    const isEdit = typeof index === 'string'; // <-- режим редактирования
 
     const [values, setValues] = React.useState({
         businessName: '',
@@ -115,10 +118,24 @@ export const Register = () => {
 
     // ---------- Действия
     const onCancel = () => history.goBack();
-
     const onConfirm = async () => {
+        console.log(values);
+
         if (!validate()) return;
 
+        // 1) тестовый вызов бэка с токеном
+        try {
+            await fetchApi('/api/admin/users', { method: 'GET' }); // токен подставится, BASE добавится
+            // Теперь запрос уйдёт на https://farm-profit-webapp.azurewebsites.net/api/admin/users
+            // Если нужно посмотреть ответ:
+            // const data = await fetchApi<any>('/api/admin/users', { method: 'GET' });
+            // console.log('users:', data);
+        } catch (e) {
+            console.error('Failed to call API:', e);
+            return;
+        }
+
+        // 2) локальное сохранение до интеграции POST /businesses
         const payload = toPayload(values);
         const key = 'business';
         let arr: BusinessPayload[] = [];
@@ -131,11 +148,9 @@ export const Register = () => {
         } catch {
             arr = [];
         }
-        if (typeof index === 'string' && arr[Number(index)]) {
-            arr[Number(index)] = payload; // update existing
-        } else {
-            arr.push(payload); // add new
-        }
+        if (isEdit && arr[Number(index)]) arr[Number(index)] = payload;
+        else arr.push(payload);
+
         localStorage.setItem(key, JSON.stringify(arr));
         history.push('/my-businesses');
     };
@@ -143,16 +158,16 @@ export const Register = () => {
     return (
         <Box sx={{ height: 1, p: 3, gap: 3, bgcolor: (t) => t.palette.grey[100] }}>
             <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-                {/* Хлебные крошки */}
+                {/* breadcrumbs */}
                 <Breadcrumbs aria-label="breadcrumb" sx={{ color: 'text.secondary', mb: 3 }}>
                     <Link underline="hover" color="inherit" href="/my-businesses">My Businesses</Link>
-                    <Typography color="textNo businesses yet. Click “Register Business”..primary">Register Business</Typography>
+                    <Typography color="text.primary">{isEdit ? 'Edit Business' : 'Register Business'}</Typography> {/* <-- FIX */}
                 </Breadcrumbs>
 
-                {/* Заголовок + кнопки справа */}
+                {/* Заголовок + кнопки */}
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 6 }}>
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                        Register Business
+                        {isEdit ? 'Edit Business' : 'Register Business'} {/* <-- динамический заголовок */}
                     </Typography>
                     <Stack direction="row" spacing={2}>
                         <Button onClick={onCancel} color="success" variant="text" sx={{ fontWeight: 600 }}>
@@ -164,7 +179,7 @@ export const Register = () => {
                             variant="contained"
                             sx={{ borderRadius: 999, px: 3, fontWeight: 700 }}
                         >
-                            Confirm
+                            {isEdit ? 'Save' : 'Confirm'} {/* <-- динамическая кнопка */}
                         </Button>
                     </Stack>
                 </Stack>

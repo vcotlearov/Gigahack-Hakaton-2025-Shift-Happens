@@ -1,42 +1,32 @@
-// src/App.tsx
-import './App.css';
-import { Route, Switch, useHistory } from 'react-router-dom';
+// src/App.tsx (v5)
+import { Switch, Route } from 'react-router-dom';
+import { PrivateRoute } from './auth/PrivateRoute';
 import WelcomeCard from './auth/WelcomeCard';
-import { MyBusinesses } from './MyBusinesses/MyBusinesses';
 import Layout from './layout/Layout';
 import { Register } from './register/Register';
+import { MyBusinesses } from './MyBusinesses/MyBusinesses';
 import { RegisterProfile } from './register/RegisterProfile';
 
-function App() {
-  const history = useHistory();
-
+function ProtectedApp() {
   return (
-    <Switch>
-      {/* Страница без общего лэйаута */}
-      <Route exact path="/">
-        <WelcomeCard
-          createAccountAction={() => history.push('/register-profile')}
-          loginAction={() => history.push('/my-businesses')}
-        />
-      </Route>
-      <Route path="/register-profile" component={RegisterProfile} />
-
-      {/* Всё остальное — внутри Header + Sidebar */}
-      <Route
-        render={() => (
-          <Layout>
-            <Switch>
-              <Route path="/my-businesses" component={MyBusinesses} />
-              <Route path="/register-business" component={Register} />
-              <Route path="/edit-business/:index" component={Register} />
-              {/* другие страницы */}
-              <Route render={() => <div style={{ padding: 24 }}>Not found</div>} />
-            </Switch>
-          </Layout>
-        )}
-      />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route exact path="/my-businesses" component={MyBusinesses} />
+        <Route exact path="/register" component={Register} />
+        <Route exact path="/edit-business/:index" component={Register} /> {/* <-- ДOБАВИЛИ */}
+        <Route exact path="/register-profile" component={RegisterProfile} />
+        {/* (необязательно) запасной маршрут, чтобы не было белого экрана */}
+        <Route component={MyBusinesses} />
+      </Switch>
+    </Layout>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Switch>
+      <Route exact path="/" component={WelcomeCard} />
+      <PrivateRoute path="/" component={ProtectedApp} />
+    </Switch>
+  );
+}

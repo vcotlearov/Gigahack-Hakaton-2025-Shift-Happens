@@ -14,6 +14,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { useHistory } from 'react-router-dom';
+import MyBusinessesEmptyState from './MyBusinessesEmptyState';
 
 // ===== Типы данных (как в последнем логе) =====
 export type LegalForm = 'SRL' | 'II' | 'GȚ';
@@ -123,30 +124,29 @@ export function MyBusinesses() {
     const history = useHistory();
     const businesses = useBusinessesFromStorage('business');
 
-    const goRegister = () => history.push('/register-business'); // при необходимости поменяй путь
+    const goRegister = () => history.push('/register'); // при необходимости поменяй путь
 
     return (
-        <Box sx={{ height: 1, p: 3, bgcolor: (t) => t.palette.grey[100] }}>
-            <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>My Businesses</Typography>
-                    <Button onClick={goRegister} startIcon={<AddRoundedIcon />} variant="contained" color="success" sx={{ borderRadius: 999, px: 2.5 }}>
-                        Register Business
-                    </Button>
-                </Stack>
+        <Box sx={{ height: 1 }} px={12} py={3}>
+            {/* <Box sx={{ maxWidth: 1200, mx: 'auto' }}> */}
 
-                {(!businesses || businesses.length === 0) ? (
-                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
-                        <Typography color="text.secondary">No businesses yet. Click “Register Business”.</Typography>
-                    </Paper>
-                ) : (
+            {(!businesses || businesses.length === 0) ? (
+                <MyBusinessesEmptyState onRegister={goRegister} />
+            ) : (
+                <>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>My Businesses</Typography>
+                        <Button onClick={goRegister} startIcon={<AddRoundedIcon />} variant="contained" color="success" sx={{ borderRadius: 999, px: 2.5 }}>
+                            Register Business
+                        </Button>
+                    </Stack>
                     <Box display="flex" gap={2.5} flexWrap={'wrap'}>
                         {businesses.map((b, i) => (
                             <BusinessCard key={i} data={b} onEdit={() => history.push(`/edit-business/${i}`)} />
                         ))}
                     </Box>
-                )}
-            </Box>
+                </>
+            )}
         </Box>
     );
 }

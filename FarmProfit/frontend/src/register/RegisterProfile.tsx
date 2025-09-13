@@ -84,13 +84,20 @@ export const RegisterProfile = () => {
     }
 
     // ---- действия
-    const onNext = () => {
+    // const onNext = () => {
+    //     if (!validate()) return;
+    //     const payload = toPayload(values);
+    //     // Демо-сохранение (как в бизнес-форме)
+    //     localStorage.setItem('profile', JSON.stringify(payload));
+    //     console.log('Profile submit payload:', payload);
+    //     history.push('/my-businesses'); // поменяй на следующий шаг онбординга
+    // };
+
+    const onNext = async () => {
         if (!validate()) return;
-        const payload = toPayload(values);
-        // Демо-сохранение (как в бизнес-форме)
-        localStorage.setItem('profile', JSON.stringify(payload));
-        console.log('Profile submit payload:', payload);
-        history.push('/my-businesses'); // поменяй на следующий шаг онбординга
+        // const payload = toPayload(values);        // уже есть в твоём коде
+        // await fetchApi('/profile', { method: 'POST', body: JSON.stringify(payload) });
+        history.push('/my-businesses');
     };
 
     return (
