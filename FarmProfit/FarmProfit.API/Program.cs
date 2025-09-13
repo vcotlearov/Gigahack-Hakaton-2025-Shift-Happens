@@ -25,13 +25,12 @@ namespace FarmProfit.API
 
 			builder.Services.AddCors(options =>
 			{
-				options.AddPolicy("AllowSpecificOrigin",
-					policy =>
-					{
-						policy.WithOrigins("http://localhost") // allowed origin(s)
-							.AllowAnyHeader()
-							.AllowAnyMethod();
-					});
+				options.AddPolicy("AllowLocalhost", policy =>
+				{
+					policy.WithOrigins("http://localhost:5173") // React dev server
+						.AllowAnyHeader()
+						.AllowAnyMethod(); // GET, POST, OPTIONS, etc.
+				});
 			});
 
 			builder.Services.AddControllers();
@@ -70,6 +69,7 @@ namespace FarmProfit.API
 			app.UseAuthorization();
 			app.UseMiddleware<UserProvisioningMiddleware>();
 
+			app.UseCors("AllowLocalhost");
 			app.MapControllers();
 
             app.Run();
