@@ -24,8 +24,10 @@ namespace FarmProfit.API
 				.Enrich.FromLogContext());
 			builder.Services.AddControllers();
 
-            builder.Services.AddDbContext<AppDbContext>(options =>
-	            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+			builder.Services.AddDbContext<AppDbContext>(options =>
+				options.UseSqlServer(
+					"Server=tcp:farm-profit.database.windows.net,1433;Database=FarmProfitDB;User ID=farm-profit-admin;Password=BSpwGBmyCJWWUwaDv5ve;Encrypt=true;"));
+			//builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var domain = "dev-iqadq0gbmsvx3bju.us.auth0.com";// builder.Configuration["Auth0:Domain"]!;
             var audience = "https://farm-profit-webapp.azurewebsites.net";// builder.Configuration["Auth0:Audience"]!;
