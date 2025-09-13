@@ -23,6 +23,17 @@ namespace FarmProfit.API
 				.ReadFrom.Services(services)
 				.Enrich.FromLogContext());
 
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowSpecificOrigin",
+					policy =>
+					{
+						policy.WithOrigins("http://localhost") // allowed origin(s)
+							.AllowAnyHeader()
+							.AllowAnyMethod();
+					});
+			});
+
 			builder.Services.AddControllers();
 
             builder.Services.AddDbContext<AppDbContext>(options =>

@@ -28,11 +28,11 @@ namespace FarmProfit.API.Middleware
 					}
 					else
 					{
-						// update last login timestamp
 						user.LastLoginAt = DateTime.UtcNow;
 					}
 
 					await db.SaveChangesAsync();
+					context.Items["Employee"] = user;
 				}
 			}
 
