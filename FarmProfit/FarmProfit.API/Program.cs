@@ -41,8 +41,8 @@ namespace FarmProfit.API
 					options.Audience = audience;
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
-						ValidateIssuer = false,
-						ValidateAudience = false,
+						ValidateIssuer = true,
+						ValidateAudience = true,
 						ValidateIssuerSigningKey = true,
 						ValidateLifetime = true,
 						ValidIssuer = $"https://{domain}/",
