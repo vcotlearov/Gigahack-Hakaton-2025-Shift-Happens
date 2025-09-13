@@ -3,6 +3,7 @@ package com.farmprofit.ui.features.home.qr_code_scan
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,16 +46,21 @@ import com.farmprofit.ui.theme.FarmProfitTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QrCodeScreen() {
+fun QrCodeScreen(
+    navigateBack: () -> Unit
+) {
     val viewModel = hiltViewModel<QrCodePartnersViewModel>()
     val partners by viewModel.partners.collectAsStateWithLifecycle()
 
-    QrCodeScreenContent(partners)
+    QrCodeScreenContent(partners, navigateBack)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun QrCodeScreenContent(partners: List<Partner>) {
+private fun QrCodeScreenContent(
+    partners: List<Partner>,
+    navigateBack: () -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
             title = {
@@ -66,7 +72,10 @@ private fun QrCodeScreenContent(partners: List<Partner>) {
             navigationIcon = {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    ""
+                    "",
+                    modifier = Modifier.clickable {
+                        navigateBack()
+                    }
                 )
             }
         )
@@ -115,13 +124,18 @@ private fun QrCodeScreenContent(partners: List<Partner>) {
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp),
                     text = stringResource(R.string.scan_qr_code_instructions),
                     style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
+                    //    textAlign = TextAlign.Center
                 )
 
                 Text(
                     "Partners:",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
-                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp, end = 16.dp, top = 16.dp)
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        bottom = 8.dp,
+                        end = 16.dp,
+                        top = 16.dp
+                    )
                 )
                 PartnersList(partners)
             }
@@ -163,7 +177,7 @@ fun PartnerCard(partner: Partner) {
     ) {
         Text(
             partner.category,
-            color = Color(0xFF4096F3),
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W700)
         )
         HorizontalDivider()
@@ -186,6 +200,6 @@ fun QrCodeScreenPreview() {
             Partner(2, "Partner 2", PartnerCategory.LIVESTOCK.displayName),
             Partner(3, "Partner 3", "Farming"),
         )
-        QrCodeScreenContent(partners)
+        QrCodeScreenContent(partners) {}
     }
 }

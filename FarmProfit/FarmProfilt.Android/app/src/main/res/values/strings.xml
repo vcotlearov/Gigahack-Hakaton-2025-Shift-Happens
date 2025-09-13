@@ -4,7 +4,8 @@
     <string name="com_auth0_scheme">demo</string>
 
     <string name="dashboard">Dashboard</string>
-    <string name="home">Home\n</string>
+    <string name="home">Home</string>
+    <string name="partners">Partners</string>
     <string name="registration_date">Registration date: %s</string>
     <string name="idno">IDNO: </string>
     <string name="active_assets">Active assets: </string>

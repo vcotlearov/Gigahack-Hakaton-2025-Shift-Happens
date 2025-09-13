@@ -58,10 +58,12 @@ fun FarmNavigation(
 
         dashboardScreen { navController.navigate(LandSelectionRoute) }
         homeScreen(
-            navigateToQrCodePartners =  {
+            navigateToQrCodePartners = {
                 navController.navigateToQrCodePartners()
             }
         )
-        qrCodePartnersScreen()
+        qrCodePartnersScreen(onNavigateBack = {
+            navController.popBackStack()
+        })
     }
 }

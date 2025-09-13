@@ -2,6 +2,7 @@ package com.farmprofit.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.farmprofit.R
@@ -19,9 +20,10 @@ enum class TopLevelDestination(
         titleTextId = R.string.home,
         route = HomeScreenRoute::class
     ),
+
     DASHBOARD(
-        icon = Icons.Default.Home,
-        titleTextId = R.string.home,
+        icon = Icons.Default.Handshake,
+        titleTextId = R.string.partners,
         route = DashboardRoute::class
     )
 }

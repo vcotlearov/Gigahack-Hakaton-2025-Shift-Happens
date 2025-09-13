@@ -9,9 +9,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 object QrCodeScan
 
-fun NavGraphBuilder.qrCodePartnersScreen() {
+fun NavGraphBuilder.qrCodePartnersScreen(onNavigateBack: () -> Unit) {
     composable<QrCodeScan> {
-        QrCodeScreen()
+        QrCodeScreen(onNavigateBack)
     }
 }
 

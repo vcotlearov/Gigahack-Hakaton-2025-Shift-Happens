@@ -88,4 +88,5 @@ dependencies {
     // retrofit
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)
+    implementation(libs.androidx.compose.material.icons.extended)
 }
