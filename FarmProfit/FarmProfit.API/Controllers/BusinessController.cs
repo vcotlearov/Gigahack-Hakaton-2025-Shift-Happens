@@ -4,7 +4,6 @@ using FarmProfit.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FarmProfit.API.Controllers;
 
@@ -24,25 +23,7 @@ public class BusinessController(AppDbContext db, ILogger<BusinessController> log
 			var businessList = await db.Businesses
 				.Include(b => b.Contract)
 				.Where(u => u.UserId == employee.Id)
-				.Select(s => new BusinessDto()
-				{
-					Id = s.Id,
-					BusinessName = s.BusinessName,
-					IDNO = s.IDNO,
-					LegalForm = s.LegalForm,
-					RegistrationDate = s.RegistrationDate,
-					UserId = s.UserId,
-					Contact = new ContractDto()
-					{
-						Id = s.Contract.Id,
-						BusinessId = s.Contract.BusinessId,
-						Address = s.Contract.Address,
-						Email = s.Contract.Email,
-						Phone = s.Contract.Phone,
-						PostalCode = s.Contract.PostalCode,
-						Region = s.Contract.Region
-					}
-				})
+				.Select(s => ConvertBusinessToDto(s))
 				.ToListAsync();
 
 			return await Task.FromResult<IActionResult>(Ok(businessList));
@@ -68,7 +49,7 @@ public class BusinessController(AppDbContext db, ILogger<BusinessController> log
 			var entity = await db.Businesses.AddAsync(business);
 			await db.SaveChangesAsync();
 
-			var response = ConvertBusinessToDto(entity);
+			var response = ConvertBusinessToDto(entity.Entity);
 			return Ok(response);
 		}
 		catch (Exception ex)
@@ -105,7 +86,7 @@ public class BusinessController(AppDbContext db, ILogger<BusinessController> log
 
 			await db.SaveChangesAsync();
 
-			var response = ConvertBusinessToDto(updatedEntity);
+			var response = ConvertBusinessToDto(updatedEntity.Entity);
 
 			return Ok(response);
 		}
@@ -136,25 +117,25 @@ public class BusinessController(AppDbContext db, ILogger<BusinessController> log
 		};
 		return business;
 	}
-	private static BusinessDto ConvertBusinessToDto(EntityEntry<Businesses> entity)
+	private static BusinessDto ConvertBusinessToDto(Businesses entity)
 	{
 		var response = new BusinessDto()
 		{
-			Id = entity.Entity.Id,
-			BusinessName = entity.Entity.BusinessName,
-			IDNO = entity.Entity.IDNO,
-			LegalForm = entity.Entity.LegalForm,
-			RegistrationDate = entity.Entity.RegistrationDate,
-			UserId = entity.Entity.UserId,
+			Id = entity.Id,
+			BusinessName = entity.BusinessName,
+			IDNO = entity.IDNO,
+			LegalForm = entity.LegalForm,
+			RegistrationDate = entity.RegistrationDate,
+			UserId = entity.UserId,
 			Contact = new ContractDto()
 			{
-				Id = entity.Entity.Contract.Id,
-				BusinessId = entity.Entity.Contract.BusinessId,
-				Address = entity.Entity.Contract.Address,
-				Email = entity.Entity.Contract.Email,
-				Phone = entity.Entity.Contract.Phone,
-				PostalCode = entity.Entity.Contract.PostalCode,
-				Region = entity.Entity.Contract.Region
+				Id = entity.Contract.Id,
+				BusinessId = entity.Contract.BusinessId,
+				Address = entity.Contract.Address,
+				Email = entity.Contract.Email,
+				Phone = entity.Contract.Phone,
+				PostalCode = entity.Contract.PostalCode,
+				Region = entity.Contract.Region
 			}
 		};
 		return response;

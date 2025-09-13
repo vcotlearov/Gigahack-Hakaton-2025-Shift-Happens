@@ -11,13 +11,16 @@ namespace FarmProfit.API.Controllers;
 [Route("api/parcel")]
 public class ParcelController(AppDbContext db, ILogger<ParcelController> logger) : ControllerBase
 {
-	[HttpGet]
+	[HttpGet("{orgId:guid}")]
 	[Authorize]
 	public async Task<IActionResult> GetParcelListForOrganization(Guid orgId)
 	{
 		try
 		{
-			var parcelList = db.Parcels.Where(p => p.Id == orgId);
+			var parcelList = await db.Parcels
+				.Where(p => p.BusinessId == orgId)
+				.Select(x=> ConvertParcelToDto(x))
+				.ToListAsync();
 			return await Task.FromResult<IActionResult>(Ok(parcelList));
 		}
 		catch (Exception ex)
@@ -29,16 +32,16 @@ public class ParcelController(AppDbContext db, ILogger<ParcelController> logger)
 
 	[HttpPost]
 	[Authorize]
-	public async Task<IActionResult> CreateParcel(Parcel parcel)
+	public async Task<IActionResult> CreateParcel(ParcelDto parcel)
 	{
 		try
 		{
 			var employee = HttpContext.GetEmployee();
 			if (employee is null) return BadRequest();
 
-			var entity = await db.Parcels.AddAsync(parcel);
+			var entity = await db.Parcels.AddAsync(ConvertDtoToParcel(parcel));
 			await db.SaveChangesAsync();
-			return Ok(entity.Entity);
+			return Ok(ConvertParcelToDto(entity.Entity));
 		}
 		catch (Exception ex)
 		{
@@ -49,7 +52,7 @@ public class ParcelController(AppDbContext db, ILogger<ParcelController> logger)
 
 	[HttpPut]
 	[Authorize]
-	public async Task<IActionResult> UpdateParcel(Parcel parcel)
+	public async Task<IActionResult> UpdateParcel(ParcelDto parcel)
 	{
 		try
 		{
@@ -69,12 +72,42 @@ public class ParcelController(AppDbContext db, ILogger<ParcelController> logger)
 			var updatedEntity = db.Parcels.Update(entity);
 
 			await db.SaveChangesAsync();
-			return Ok(updatedEntity);
+			return Ok(ConvertParcelToDto(updatedEntity.Entity));
 		}
 		catch (Exception ex)
 		{
 			logger.LogError($"Error during parcel update: {ex.Message}");
 			return BadRequest(ex.Message);
 		}
+	}
+
+	private static ParcelDto ConvertParcelToDto(Parcel parcel)
+	{
+		return new ParcelDto
+		{
+			Id = parcel.Id,
+			BusinessId = parcel.BusinessId,
+			Area = parcel.Area,
+			CadastralNumber = parcel.CadastralNumber,
+			LandType = parcel.LandType,
+			Name = parcel.Name,
+			Ownership = parcel.Ownership,
+			GeoJson = parcel.GeoJson,
+		};
+	}
+
+	private static Parcel ConvertDtoToParcel(ParcelDto dto)
+	{
+		return new Parcel
+		{
+			Id = dto.Id,
+			BusinessId = dto.BusinessId,
+			Area = dto.Area,
+			CadastralNumber = dto.CadastralNumber,
+			LandType = dto.LandType,
+			Name = dto.Name,
+			Ownership = dto.Ownership,
+			GeoJson = dto.GeoJson,
+		};
 	}
 }

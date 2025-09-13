@@ -15,8 +15,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.ToTable("Businesses", b => b.IsTemporal(
 				t =>
 				{
-					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime"); ;
-					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime"); ;
+					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime");
+					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime");
 					t.UseHistoryTable("BusinessesHistory");
 				}));
 
@@ -24,8 +24,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.ToTable("Contacts", b => b.IsTemporal(
 				t =>
 				{
-					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime"); ;
-					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime"); ;
+					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime");
+					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime");
 					t.UseHistoryTable("ContactsHistory");
 				}));
 
@@ -39,8 +39,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.ToTable("Parcels", b => b.IsTemporal(
 				t =>
 				{
-					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime"); ;
-					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime"); ;
+					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime");
+					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime");
 					t.UseHistoryTable("ParcelsHistory");
 				}));
 
