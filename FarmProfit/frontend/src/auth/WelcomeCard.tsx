@@ -16,6 +16,24 @@ export default function WelcomeCard() {
         if (isAuthenticated) history.replace('/my-businesses');
     }, [isAuthenticated, history]);
 
+    const handleLogin = () =>
+        loginWithRedirect({
+            // откроется форма Log in
+            authorizationParams: {
+                screen_hint: 'login',          // 👈 логин сразу
+            },
+            appState: { returnTo: '/my-businesses' }, // после логина сюда
+        });
+
+    const handleSignup = () =>
+        loginWithRedirect({
+            // откроется форма Sign up
+            authorizationParams: {
+                screen_hint: 'signup',         // 👈 регистрация сразу
+            },
+            appState: { returnTo: '/register-profile' }, // после регистрации сюда
+        });
+
     return (
         <Box
             sx={{
@@ -26,18 +44,9 @@ export default function WelcomeCard() {
                 px: 2,
             }}
         >
-            <Paper
-                elevation={0}
-                sx={{
-                    width: 462,
-                    height: 329,
-                    maxWidth: '92vw',
-                    p: 4,
-                }}
-            >
+            <Paper elevation={0} sx={{ width: 462, height: 329, maxWidth: '92vw', p: 4 }}>
                 <Logo />
 
-                {/* Заголовок + сабтекст */}
                 <Stack alignItems="center" textAlign="center" spacing={2} mb={3} mt={3}>
                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
                         Welcome to FarmProfit!
@@ -47,14 +56,9 @@ export default function WelcomeCard() {
                     </Typography>
                 </Stack>
 
-                {/* Кнопки */}
                 <Stack spacing={4} alignItems="stretch">
                     <Button
-                        onClick={() =>
-                            loginWithRedirect({
-                                appState: { returnTo: '/my-businesses' }, // после логина
-                            })
-                        }
+                        onClick={handleLogin}
                         variant="contained"
                         size="large"
                         fullWidth
@@ -65,11 +69,7 @@ export default function WelcomeCard() {
                     </Button>
 
                     <MuiLink
-                        onClick={() =>
-                            loginWithRedirect({
-                                appState: { returnTo: '/register-profile' } // после регистрации
-                            })
-                        }
+                        onClick={handleSignup}
                         underline="none"
                         textAlign="center"
                         sx={{ fontWeight: 500, color: 'primary.main', cursor: 'pointer' }}

@@ -10,11 +10,7 @@ import {
     Checkbox,
     FormControlLabel,
     Link,
-    IconButton,
-    InputAdornment,
 } from '@mui/material';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useHistory } from 'react-router-dom';
 import { Logo } from '../logo/Logo';
 
@@ -22,10 +18,8 @@ import { Logo } from '../logo/Logo';
 export interface ProfilePayload {
     firstName: string;
     lastName: string;
-    email: string;
     phone: string;
     idnp: string;          // 13 цифр
-    password: string;      // (демо) — в реале не кладём в LS, а шифруем/шлём на бэк
     acceptedTerms: boolean;
 }
 
@@ -36,16 +30,12 @@ export const RegisterProfile = () => {
     const [values, setValues] = React.useState({
         firstName: '',
         lastName: '',
-        email: '',
         phone: '',
         idnp: '',
-        password: '',
         confirmPassword: '',
         accepted: true,
     });
     const [errors, setErrors] = React.useState<Record<string, string>>({});
-    const [showPw, setShowPw] = React.useState(false);
-    const [showPw2, setShowPw2] = React.useState(false);
 
     const handle =
         (key: keyof typeof values) =>
@@ -56,28 +46,23 @@ export const RegisterProfile = () => {
             };
 
     // ---- нормализация (склейка) как в твоём коде
-    function toPayload(v: typeof values): ProfilePayload {
-        return {
-            firstName: v.firstName.trim(),
-            lastName: v.lastName.trim(),
-            email: v.email.trim(),
-            phone: v.phone.trim(),
-            idnp: v.idnp.replace(/\s/g, ''),
-            password: v.password,
-            acceptedTerms: v.accepted,
-        };
-    }
+    // function toPayload(v: typeof values): ProfilePayload {
+    //     return {
+    //         firstName: v.firstName.trim(),
+    //         lastName: v.lastName.trim(),
+    //         phone: v.phone.trim(),
+    //         idnp: v.idnp.replace(/\s/g, ''),
+    //         acceptedTerms: v.accepted,
+    //     };
+    // }
 
     // ---- валидация (минимально)
     function validate(v = values) {
         const e: Record<string, string> = {};
         if (!v.firstName.trim()) e.firstName = 'Required';
         if (!v.lastName.trim()) e.lastName = 'Required';
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) e.email = 'Enter a valid email';
         if (!v.phone.trim()) e.phone = 'Required';
         if (!/^\d{13}$/.test(v.idnp.replace(/\s/g, ''))) e.idnp = 'Enter 13 digits';
-        if (v.password.length < 8) e.password = 'Min 8 characters';
-        if (v.password !== v.confirmPassword) e.confirmPassword = 'Passwords do not match';
         if (!v.accepted) e.accepted = 'You must accept terms';
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -162,19 +147,6 @@ export const RegisterProfile = () => {
 
                     <TextField
                         required
-                        type="email"
-                        label="Email"
-                        placeholder="Enter your email"
-                        value={values.email}
-                        onChange={handle('email')}
-                        error={!!errors.email}
-                        helperText={errors.email}
-                        fullWidth
-                        sx={{ '& fieldset': { borderRadius: 2 } }}
-                    />
-
-                    <TextField
-                        required
                         label="Phone Number"
                         placeholder="+373XX XX XX XX"
                         value={values.phone}
@@ -197,50 +169,6 @@ export const RegisterProfile = () => {
                         fullWidth
                         inputProps={{ maxLength: 13 }}
                         sx={{ '& fieldset': { borderRadius: 2 } }}
-                    />
-
-                    <TextField
-                        required
-                        label="Password"
-                        placeholder="Enter password"
-                        type={showPw ? 'text' : 'password'}
-                        value={values.password}
-                        onChange={handle('password')}
-                        error={!!errors.password}
-                        helperText={errors.password}
-                        fullWidth
-                        sx={{ '& fieldset': { borderRadius: 2 } }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPw((s) => !s)} edge="end">
-                                        {showPw ? <VisibilityOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-
-                    <TextField
-                        required
-                        label="Confirm Password"
-                        placeholder="Enter password confirmation"
-                        type={showPw2 ? 'text' : 'password'}
-                        value={values.confirmPassword}
-                        onChange={handle('confirmPassword')}
-                        error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword}
-                        fullWidth
-                        sx={{ '& fieldset': { borderRadius: 2 } }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPw2((s) => !s)} edge="end">
-                                        {showPw2 ? <VisibilityOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
                     />
 
                     <FormControlLabel

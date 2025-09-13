@@ -1,11 +1,16 @@
-// src/App.tsx (v5)
 import { Switch, Route } from 'react-router-dom';
 import { PrivateRoute } from './auth/PrivateRoute';
 import WelcomeCard from './auth/WelcomeCard';
 import Layout from './layout/Layout';
+
 import { Register } from './register/Register';
-import { MyBusinesses } from './MyBusinesses/MyBusinesses';
 import { RegisterProfile } from './register/RegisterProfile';
+
+import CreateCropsAsset from './assets/CreateCropsAsset';
+import BusinessDetails from './MyBusinesses/BusinessDetails';
+import BusinessOverview from './MyBusinesses/BusinessOverview';
+import { MyBusinesses } from './MyBusinesses/MyBusinesses';
+import Settings from './settings/Settings';
 
 function ProtectedApp() {
   return (
@@ -13,10 +18,12 @@ function ProtectedApp() {
       <Switch>
         <Route exact path="/my-businesses" component={MyBusinesses} />
         <Route exact path="/register" component={Register} />
-        <Route exact path="/edit-business/:index" component={Register} /> {/* <-- ДOБАВИЛИ */}
-        <Route exact path="/register-profile" component={RegisterProfile} />
-        {/* (необязательно) запасной маршрут, чтобы не было белого экрана */}
-        <Route component={MyBusinesses} />
+
+        <Route exact path="/business/:index" component={BusinessDetails} />
+        <Route exact path="/business/:index/assets/new" component={BusinessOverview} />
+        <Route exact path="/business/:index/assets/new/land" component={CreateCropsAsset} />
+        <Route path="/settings" exact component={Settings} />
+
       </Switch>
     </Layout>
   );
@@ -25,6 +32,7 @@ function ProtectedApp() {
 export default function App() {
   return (
     <Switch>
+      <Route exact path="/register-profile" component={RegisterProfile} />
       <Route exact path="/" component={WelcomeCard} />
       <PrivateRoute path="/" component={ProtectedApp} />
     </Switch>

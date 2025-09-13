@@ -3,9 +3,8 @@
 import * as React from 'react';
 import {
     Box, Stack, Typography, Paper, TextField, Button, Breadcrumbs, Link,
-    FormControl, InputLabel, Select, MenuItem, InputAdornment, FormHelperText
+    FormControl, InputLabel, Select, MenuItem, FormHelperText
 } from '@mui/material';
-import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { useHistory, useParams } from 'react-router-dom';
 import { useApi } from '../lib/api';
@@ -118,24 +117,18 @@ export const Register = () => {
 
     // ---------- Действия
     const onCancel = () => history.goBack();
+    // внутри Register.tsx (как у тебя выше)
     const onConfirm = async () => {
-        console.log(values);
-
         if (!validate()) return;
 
-        // 1) тестовый вызов бэка с токеном
         try {
-            await fetchApi('/api/admin/users', { method: 'GET' }); // токен подставится, BASE добавится
-            // Теперь запрос уйдёт на https://farm-profit-webapp.azurewebsites.net/api/admin/users
-            // Если нужно посмотреть ответ:
-            // const data = await fetchApi<any>('/api/admin/users', { method: 'GET' });
-            // console.log('users:', data);
+            await fetchApi('/api/admin/users', { method: 'GET' });
         } catch (e) {
             console.error('Failed to call API:', e);
             return;
         }
 
-        // 2) локальное сохранение до интеграции POST /businesses
+        // сохранить бизнес в localStorage (как у тебя)
         const payload = toPayload(values);
         const key = 'business';
         let arr: BusinessPayload[] = [];
@@ -145,15 +138,18 @@ export const Register = () => {
                 const parsed = JSON.parse(raw);
                 arr = Array.isArray(parsed) ? parsed : [parsed];
             }
-        } catch {
-            arr = [];
-        }
+        } catch { arr = []; }
+
         if (isEdit && arr[Number(index)]) arr[Number(index)] = payload;
         else arr.push(payload);
-
         localStorage.setItem(key, JSON.stringify(arr));
+
+        // 👇 одноразовый флаг для показа модалки на следующем экране
+        if (!isEdit) sessionStorage.setItem('fp:show_welcome_business', '1');
+
         history.push('/my-businesses');
     };
+
 
     return (
         <Box sx={{ height: 1, p: 3, gap: 3, bgcolor: (t) => t.palette.grey[100] }}>
@@ -228,14 +224,6 @@ export const Register = () => {
                                     error={!!errors.regDate}
                                     helperText={errors.regDate}
                                     fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <CalendarMonthOutlinedIcon sx={{ color: 'text.disabled' }} />
-                                            </InputAdornment>
-                                        ),
-                                    }}
                                 />
 
                                 {/* Select без «пропила» сверху */}
@@ -286,7 +274,6 @@ export const Register = () => {
                                     type="email"
                                     label="Email"
                                     placeholder="admin@farmprofit.com"
-                                    value={values.email}
                                     onChange={handle('email')}
                                     error={!!errors.email}
                                     helperText={errors.email}
@@ -297,7 +284,6 @@ export const Register = () => {
                                     required
                                     label="Phone Number"
                                     placeholder="+373 68 42 30 07"
-                                    value={values.phone}
                                     onChange={handle('phone')}
                                     error={!!errors.phone}
                                     helperText={errors.phone}

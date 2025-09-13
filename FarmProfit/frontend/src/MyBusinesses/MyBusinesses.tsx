@@ -8,13 +8,17 @@ import {
     Chip,
     Tooltip,
     Link as MLink,
-    Divider,
+    IconButton,
+    Menu,
+    MenuItem,
 } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { useHistory } from 'react-router-dom';
 import MyBusinessesEmptyState from './MyBusinessesEmptyState';
+import CongratsBusinessModal from '../modals/CongratsBusinessModal';
 
 // ===== Типы данных (как в последнем логе) =====
 export type LegalForm = 'SRL' | 'II' | 'GȚ';
@@ -50,6 +54,7 @@ const fmtDate = (iso: string) => {
 
 function useBusinessesFromStorage(key = 'business') {
     const [items, setItems] = React.useState<BusinessPayload[]>([]);
+
     React.useEffect(() => {
         try {
             const raw = localStorage.getItem(key);
@@ -64,33 +69,84 @@ function useBusinessesFromStorage(key = 'business') {
     }, [key]);
     return items;
 }
+function BusinessCard({
+    data,
+    onEdit,
+    onView,
+}: {
+    data: BusinessPayload;
+    onEdit?: () => void;
+    onView?: () => void;
+}) {
+    const [menuEl, setMenuEl] = React.useState<null | HTMLElement>(null);
+    const menuOpen = Boolean(menuEl);
 
-function BusinessCard({ data, onEdit }: { data: BusinessPayload, onEdit?: () => void }) {
     return (
-        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, position: 'relative', pt: 5 }}>
+            {/* Три точки — ВЕРХНИЙ ЛЕВЫЙ УГОЛ */}
+            <IconButton
+                size="small"
+                onClick={(e) => setMenuEl(e.currentTarget)}
+                sx={{ position: 'absolute', top: 8, right: 8 }}
+                aria-label="more"
+            >
+                <MoreVertIcon />
+            </IconButton>
+
+            <Menu
+                anchorEl={menuEl}
+                open={menuOpen}
+                onClose={() => setMenuEl(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+                <MenuItem
+                    onClick={() => {
+                        setMenuEl(null);
+                        onView?.();
+                    }}
+                >
+                    <Typography>View details</Typography>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        setMenuEl(null);
+                        onEdit?.();
+                    }}
+                >
+                    <Typography>Edit business</Typography>
+                </MenuItem>
+            </Menu>
+
+            {/* Содержимое карточки */}
             <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2} px={2.5} py={1.5}>
                 <Box>
-                    <Typography align='left' variant="h6" sx={{ fontWeight: 700 }}>{data.businessName || '—'}</Typography>
+                    <Typography align="left" variant="h6" sx={{ fontWeight: 700 }}>
+                        {data.businessName || '—'}
+                    </Typography>
                     <Stack spacing={1} sx={{ mt: 1 }}>
-                        <Typography align='left'>
-                            <b>IDNO:</b> <MLink underline="hover" sx={{ fontWeight: 700 }}>{data.idno || '—'}</MLink>
+                        <Typography align="left">
+                            <b>IDNO:</b>{' '}
+                            <MLink underline="hover" sx={{ fontWeight: 700 }}>
+                                {data.idno || '—'}
+                            </MLink>
                         </Typography>
-                        <Typography align='left'>
+                        <Typography align="left">
                             <b>Legal form:</b> {mapLegal[data.legalForm] || data.legalForm || '—'}
                         </Typography>
-                        <Typography align='left'>
+                        <Typography align="left">
                             <b>Registration date:</b> {fmtDate(data.registrationDate)}
                         </Typography>
-                        <Typography align='left'>
+                        <Typography align="left">
                             <b>Region:</b> {data.contact?.region || '—'}
                         </Typography>
-                        <Typography align='left'>
+                        <Typography align="left">
                             <b>Contact email:</b> {data.contact?.email || '—'}
                         </Typography>
-                        <Typography align='left'>
+                        <Typography align="left">
                             <b>Contact phone:</b> {data.contact?.phone || '—'}
                         </Typography>
-                        <MLink href="#" sx={{ color: 'primary.main', display: 'inline-flex', alignItems: 'center', gap: .5 }}>
+                        <MLink href="#" sx={{ color: 'primary.main', display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                             <VerifiedRoundedIcon fontSize="small" /> Verified by AIPA
                         </MLink>
                     </Stack>
@@ -105,24 +161,30 @@ function BusinessCard({ data, onEdit }: { data: BusinessPayload, onEdit?: () => 
                     </Typography>
                     <Stack direction="column" spacing={1}>
                         <Chip label="Active assets: 0" size="small" variant="outlined" />
-                        <Chip label="Balance: 0 lei" size="small" variant="outlined" />
+                        <Chip label="Balance: 1000 lei" size="small" variant="outlined" />
                     </Stack>
                 </Stack>
             </Stack>
 
-            <Divider sx={{ my: 2 }} />
-
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                <Button variant="outlined" color="success" sx={{ borderRadius: 3, px: 2 }} onClick={onEdit}>Edit Business</Button>
-                <Button variant="contained" color="success" sx={{ borderRadius: 3, px: 2 }}>View Details</Button>
-            </Stack>
+            {/* Удалили нижние кнопки Edit/View */}
+            {/* <Divider sx={{ my: 2 }} /> ... */}
         </Paper>
     );
 }
 
+
 export function MyBusinesses() {
     const history = useHistory();
     const businesses = useBusinessesFromStorage('business');
+
+    const [showCongrats, setShowCongrats] = React.useState(false);
+
+    React.useEffect(() => {
+        if (sessionStorage.getItem('fp:show_welcome_business') === '1') {
+            setShowCongrats(true);
+            sessionStorage.removeItem('fp:show_welcome_business'); // чтобы не всплывало повторно
+        }
+    }, []);
 
     const goRegister = () => history.push('/register'); // при необходимости поменяй путь
 
@@ -142,11 +204,21 @@ export function MyBusinesses() {
                     </Stack>
                     <Box display="flex" gap={2.5} flexWrap={'wrap'}>
                         {businesses.map((b, i) => (
-                            <BusinessCard key={i} data={b} onEdit={() => history.push(`/edit-business/${i}`)} />
+                            <BusinessCard
+                                key={i}
+                                data={b}
+                                onView={() => history.push(`/business/${i}`)}     // → http://localhost:5173/business/1
+                                onEdit={() => history.push(`/edit-business/${i}`)}
+                            />
                         ))}
                     </Box>
                 </>
             )}
+            {/* Модалка — просто внизу JSX */}
+            <CongratsBusinessModal
+                open={showCongrats}
+                onClose={() => setShowCongrats(false)}
+            />
         </Box>
     );
 }
