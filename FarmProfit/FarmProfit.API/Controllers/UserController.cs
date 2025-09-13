@@ -108,10 +108,20 @@ public class UsersController(AppDbContext db, HttpClient httpClient, ILogger<Use
 
 	[HttpGet("all")]
 	[Authorize]
-	public Task<IActionResult> GetListOfUsers()
+	public async Task<IActionResult> GetListOfUsers()
 	{
-		var users = db.Users.Select(u => new { u.Id, u.Email, u.Name, u.Phone, u.CreatedAt });
-		return Task.FromResult<IActionResult>(Ok(users));
+		try
+		{
+			var users = db.Users.Select(u => new { u.Id, u.Email, u.Name, u.Phone, u.CreatedAt });
+			return await Task.FromResult<IActionResult>(Ok(users));
+		}
+		catch (Exception ex)
+		{
+			logger.LogError($"Error during save: {ex.Message}");
+			return BadRequest(ex.Message);
+		}
+
+		
 	}
 
 	[HttpGet("public")]
