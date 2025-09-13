@@ -3,36 +3,83 @@ using FarmProfit.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
 
 namespace FarmProfit.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class UsersController(AppDbContext db) : ControllerBase
+public class UserRegistrationRequest
 {
-	// 1️⃣ Register a new user (requires Auth0 login)
+	public string Name { get; set; }
+	public string Phone { get; set; }
+	public string Email { get; set; }
+	public string Password { get; set; }
+}
+
+[ApiController]
+[Route("api/users")]
+public class UsersController(AppDbContext db, HttpClient httpClient) : ControllerBase
+{
+	private readonly string _auth0Domain = "dev-iqadq0gbmsvx3bju.us.auth0.com";
+
 	[HttpPost("register")]
-	[Authorize]
-	public async Task<IActionResult> Register([FromBody] User dto)
+	public async Task<IActionResult> Register([FromBody] UserRegistrationRequest request)
 	{
-		var auth0Id = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-		if (auth0Id == null) return Unauthorized();
+		var managementToken = await GetManagementApiAccessToken();
 
-		var exists = await db.Users.FirstOrDefaultAsync(u => u.Auth0Id == auth0Id);
-		if (exists != null) return Conflict("User already registered");
-
-		var user = new User
+		var userData = new
 		{
-			Auth0Id = auth0Id,
-			Name = dto.Name,
-			Phone = dto.Phone,
-			CreatedAt = DateTime.UtcNow
+			email = request.Email,
+			connection = "Username-Password-Authentication", // Auth0 Database connection name
+			password = request.Password,
+			user_metadata = new { name = request.Name }
 		};
 
-		db.Users.Add(user);
-		await db.SaveChangesAsync();
+		var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"https://{_auth0Domain}/api/v2/users");
+		httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", managementToken);
+		httpRequest.Content = new StringContent(JsonSerializer.Serialize(userData), Encoding.UTF8, "application/json");
 
-		return Ok(user);
+		var response = await httpClient.SendAsync(httpRequest);
+		if (response.IsSuccessStatusCode)
+		{
+
+			var user = new User
+			{
+				Name = request.Name,
+				Phone = request.Phone,
+				CreatedAt = DateTime.UtcNow
+			};
+
+			db.Users.Add(user);
+			await db.SaveChangesAsync();
+
+			return Ok(user);
+			return Ok("User registered");
+		}
+
+		var error = await response.Content.ReadAsStringAsync();
+		return BadRequest(error);
+	}
+
+	private async Task<string> GetManagementApiAccessToken()
+	{
+		var client = new HttpClient();
+
+		var requestBody = new Dictionary<string, string>
+		{
+			{ "client_id", "l4av6wENlxynvRsQWFz1Un4s49E3xEK0" },
+			{ "client_secret", "6DbDwUzolHuGKOG6C6mc1LLARAVBnI2K1PDH_0Plc5_GMfmzaiI_Vt8Aupr0Qq5x" },
+			{ "audience", $"https://{_auth0Domain}/api/v2/" },
+			{ "grant_type", "client_credentials" }
+		};
+
+		var response = await client.PostAsync(
+			$"https://{_auth0Domain}/oauth/token",
+			new FormUrlEncodedContent(requestBody));
+
+		string responseBody = await response.Content.ReadAsStringAsync();
+		var tokenObj = JsonDocument.Parse(responseBody);
+		return tokenObj.RootElement.GetProperty("access_token").GetString() ?? "";
 	}
 
 	[HttpGet("secure")]

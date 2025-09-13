@@ -1,3 +1,4 @@
+using Auth0.AspNetCore.Authentication;
 using FarmProfit.API.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,9 @@ namespace FarmProfit.API
             builder.Services.AddDbContext<AppDbContext>(options =>
 	            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+			var domain = builder.Configuration["Auth0:Domain"]!;
+			var audience = builder.Configuration["Auth0:Audience"]!;
+
 			builder.Services.AddAuthentication(options =>
 				{
 					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -23,10 +27,8 @@ namespace FarmProfit.API
 				})
 				.AddJwtBearer(options =>
 				{
-					options.Authority = "https://dev-iqadq0gbmsvx3bju.us.auth0.com/";
-					options.Audience = "https://farm-profit-webapp.azurewebsites.net";
-
-					// Optional: validate additional parameters
+					options.Authority = $"https://{domain}/";
+					options.Audience = audience;
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true
@@ -35,6 +37,7 @@ namespace FarmProfit.API
 
 			// Add Authorization if needed
 			builder.Services.AddAuthorization();
+			builder.Services.AddHttpClient();
 
 			var app = builder.Build();
 
