@@ -85,5 +85,7 @@ dependencies {
     implementation(libs.auth0)
     //datastore
     implementation(libs.androidx.datastore.preferences)
-
+    // retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlin.serialization)
 }
