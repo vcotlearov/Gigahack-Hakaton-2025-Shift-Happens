@@ -10,5 +10,6 @@
 		public string LegalForm { get; set; }
 
 		public Contacts Contact { get; set; }
+		public ICollection<Parcel> Parcels { get; set; } = new List<Parcel>();
 	}
 }

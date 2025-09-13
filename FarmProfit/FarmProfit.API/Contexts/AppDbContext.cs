@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<User> Users { get; set; }
 	public DbSet<Businesses> Businesses { get; set; }
 	public DbSet<Contacts> Contacts { get; set; }
+	public DbSet<Parcel> Parcels { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -18,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime"); ;
 					t.UseHistoryTable("BusinessesHistory");
 				}));
+
 		modelBuilder.Entity<Contacts>()
 			.ToTable("Contacts", b => b.IsTemporal(
 				t =>
@@ -31,6 +33,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.HasOne(b => b.Contact)
 			.WithOne(c => c.Business)
 			.HasForeignKey<Contacts>(c => c.BusinessId)
+			.OnDelete(DeleteBehavior.Cascade);
+
+		modelBuilder.Entity<Parcel>()
+			.ToTable("Parcels", b => b.IsTemporal(
+				t =>
+				{
+					t.HasPeriodStart("SysStartTime").HasColumnName("SysStartTime"); ;
+					t.HasPeriodEnd("SysEndTime").HasColumnName("SysEndTime"); ;
+					t.UseHistoryTable("ParcelsHistory");
+				}));
+
+		modelBuilder.Entity<Parcel>()
+			.HasOne(p => p.Business)
+			.WithMany(b => b.Parcels)
+			.HasForeignKey(p => p.BusinessId)
 			.OnDelete(DeleteBehavior.Cascade);
 	}
 }

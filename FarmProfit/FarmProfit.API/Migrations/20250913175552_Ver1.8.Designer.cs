@@ -4,6 +4,7 @@ using FarmProfit.API.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarmProfit.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250913175552_Ver1.8")]
+    partial class Ver18
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,66 +133,6 @@ namespace FarmProfit.API.Migrations
                             }));
                 });
 
-            modelBuilder.Entity("FarmProfit.API.Models.Parcel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<float>("Area")
-                        .HasColumnType("real");
-
-                    b.Property<Guid>("BusinessId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CadastralNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GeoJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LandType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Ownership")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SysEndTime")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("SysEndTime");
-
-                    b.Property<DateTime>("SysStartTime")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("SysStartTime");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusinessId");
-
-                    b.ToTable("Parcels", (string)null);
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                            {
-                                ttb.UseHistoryTable("ParcelsHistory");
-                                ttb
-                                    .HasPeriodStart("SysStartTime")
-                                    .HasColumnName("SysStartTime");
-                                ttb
-                                    .HasPeriodEnd("SysEndTime")
-                                    .HasColumnName("SysEndTime");
-                            }));
-                });
-
             modelBuilder.Entity("FarmProfit.API.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -230,23 +173,10 @@ namespace FarmProfit.API.Migrations
                     b.Navigation("Business");
                 });
 
-            modelBuilder.Entity("FarmProfit.API.Models.Parcel", b =>
-                {
-                    b.HasOne("FarmProfit.API.Models.Businesses", "Business")
-                        .WithMany("Parcels")
-                        .HasForeignKey("BusinessId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Business");
-                });
-
             modelBuilder.Entity("FarmProfit.API.Models.Businesses", b =>
                 {
                     b.Navigation("Contact")
                         .IsRequired();
-
-                    b.Navigation("Parcels");
                 });
 #pragma warning restore 612, 618
         }
