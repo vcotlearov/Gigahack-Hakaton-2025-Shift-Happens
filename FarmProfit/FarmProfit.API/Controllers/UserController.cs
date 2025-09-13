@@ -106,6 +106,14 @@ public class UsersController(AppDbContext db, HttpClient httpClient, ILogger<Use
 		return Ok(new { message = "You are authenticated", user });
 	}
 
+	[HttpGet("all")]
+	[Authorize]
+	public Task<IActionResult> GetListOfUsers()
+	{
+		var users = db.Users.Select(u => new { u.Id, u.Email, u.Name, u.Phone, u.CreatedAt });
+		return Task.FromResult<IActionResult>(Ok(users));
+	}
+
 	[HttpGet("public")]
 	public IActionResult Public()
 	{
