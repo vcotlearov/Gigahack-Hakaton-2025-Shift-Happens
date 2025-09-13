@@ -1,0 +1,42 @@
+﻿using FarmProfit.API.Contexts;
+using System.Security.Claims;
+using FarmProfit.API.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace FarmProfit.API.Middleware
+{
+	public class UserProvisioningMiddleware(RequestDelegate next)
+	{
+		public async Task InvokeAsync(HttpContext context, AppDbContext db)
+		{
+			if (context.User.Identity?.IsAuthenticated == true)
+			{
+				var sub = context.User.FindFirst("sub")?.Value;
+				var email = context.User.FindFirst(ClaimTypes.Email)?.Value;
+
+				if (!string.IsNullOrEmpty(sub))
+				{
+					var user = await db.Users.FirstOrDefaultAsync(u => u.Auth0Id == sub);
+					if (user == null)
+					{
+						db.Users.Add(new User
+						{
+							Auth0Id = sub,
+							Email = email ?? "unknown@example.com",
+							CreatedAt = DateTime.UtcNow
+						});
+					}
+					else
+					{
+						// update last login timestamp
+						user.LastLoginAt = DateTime.UtcNow;
+					}
+
+					await db.SaveChangesAsync();
+				}
+			}
+
+			await next(context);
+		}
+	}
+}

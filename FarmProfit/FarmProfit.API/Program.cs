@@ -1,23 +1,65 @@
+using FarmProfit.API.Contexts;
+using FarmProfit.API.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+
 namespace FarmProfit.API
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+	        Log.Logger = new LoggerConfiguration()
+		        .Enrich.FromLogContext()
+		        .WriteTo.Console()
+		        .CreateBootstrapLogger();
 
-            // Add services to the container.
+			var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+			builder.Services.AddSerilog((services, lc) => lc
+				.ReadFrom.Configuration(builder.Configuration)
+				.ReadFrom.Services(services)
+				.Enrich.FromLogContext());
 
-            var app = builder.Build();
+			builder.Services.AddControllers();
 
-            // Configure the HTTP request pipeline.
+            builder.Services.AddDbContext<AppDbContext>(options =>
+	            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            app.UseAuthorization();
+            var domain = builder.Configuration["Auth0:Domain"]!;
+            var audience = builder.Configuration["Auth0:Audience"]!;
 
+			builder.Services.AddAuthentication(options =>
+				{
+					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				})
+				.AddJwtBearer(options =>
+				{
+					options.Authority = $"https://{domain}/";
+					options.Audience = audience;
+					options.TokenValidationParameters = new TokenValidationParameters
+					{
+						ValidateIssuer = true,
+						ValidateAudience = true,
+						ValidateIssuerSigningKey = true,
+						ValidateLifetime = true,
+						ValidAudience = audience
+					};
+				});
 
-            app.MapControllers();
+			builder.Services.AddAuthorization();
+			builder.Services.AddHttpClient();
+
+			var app = builder.Build();
+
+			app.UseAuthentication();
+			app.UseAuthorization();
+			app.UseMiddleware<UserProvisioningMiddleware>();
+
+			app.MapControllers();
 
             app.Run();
         }

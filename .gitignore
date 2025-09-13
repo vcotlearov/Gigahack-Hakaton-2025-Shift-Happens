@@ -1,2 +1,4 @@
 /FarmProfit/.vs
 /FarmProfit/FarmProfit.API/obj
+/FarmProfit/FarmProfit.API/bin
+FarmProfit/FarmProfit.API/Logs/log.txt
