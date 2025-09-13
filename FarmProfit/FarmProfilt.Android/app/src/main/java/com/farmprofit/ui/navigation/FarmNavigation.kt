@@ -37,7 +37,11 @@ fun FarmNavigation(
         }
 
         composable<LandSelectionRoute> {
-            MapLandSelectionScreen()
+            MapLandSelectionScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
