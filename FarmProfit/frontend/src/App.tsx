@@ -11,6 +11,7 @@ import BusinessDetails from './MyBusinesses/BusinessDetails';
 import BusinessOverview from './MyBusinesses/BusinessOverview';
 import { MyBusinesses } from './MyBusinesses/MyBusinesses';
 import Settings from './settings/Settings';
+import { Dashboard } from './dashboard/Dashboard';
 
 function ProtectedApp() {
   return (
@@ -18,7 +19,7 @@ function ProtectedApp() {
       <Switch>
         <Route exact path="/my-businesses" component={MyBusinesses} />
         <Route exact path="/register" component={Register} />
-
+        <Route exact path="/dashboard" component={Dashboard} />
         <Route exact path="/business/:index" component={BusinessDetails} />
         <Route exact path="/business/:index/assets/new" component={BusinessOverview} />
         <Route exact path="/business/:index/assets/new/land" component={CreateCropsAsset} />

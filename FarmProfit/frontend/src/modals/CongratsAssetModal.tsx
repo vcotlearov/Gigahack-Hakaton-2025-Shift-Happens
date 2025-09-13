@@ -1,9 +1,7 @@
 // src/components/CongratsAssetModal.tsx
-import * as React from 'react';
 import {
     Dialog, Box, Stack, Typography, Button, IconButton
 } from '@mui/material';
-import CelebrationRoundedIcon from '@mui/icons-material/CelebrationRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { Congrats } from '../icons/Congrats';
 

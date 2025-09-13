@@ -13,7 +13,7 @@ export default function WelcomeCard() {
 
     // Если уже залогинен — отправляем в приложение
     React.useEffect(() => {
-        if (isAuthenticated) history.replace('/my-businesses');
+        if (isAuthenticated) history.replace('/dashboard');
     }, [isAuthenticated, history]);
 
     const handleLogin = () =>
@@ -22,7 +22,7 @@ export default function WelcomeCard() {
             authorizationParams: {
                 screen_hint: 'login',          // 👈 логин сразу
             },
-            appState: { returnTo: '/my-businesses' }, // после логина сюда
+            appState: { returnTo: '/dashboard' }, // после логина сюда
         });
 
     const handleSignup = () =>

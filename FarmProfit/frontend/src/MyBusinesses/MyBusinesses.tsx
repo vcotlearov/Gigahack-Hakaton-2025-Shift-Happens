@@ -216,6 +216,12 @@ export function MyBusinesses() {
             )}
             {/* Модалка — просто внизу JSX */}
             <CongratsBusinessModal
+                action={() => {
+                    const lastIndex = businesses.length - 1;
+                    history.push(`/business/${lastIndex}/assets/new`);
+                    window.location.href = '/business/0/assets/new';
+                    setShowCongrats(false);
+                }}
                 open={showCongrats}
                 onClose={() => setShowCongrats(false)}
             />

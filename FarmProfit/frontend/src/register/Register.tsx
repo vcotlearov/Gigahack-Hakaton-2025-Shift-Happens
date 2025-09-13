@@ -144,6 +144,8 @@ export const Register = () => {
         else arr.push(payload);
         localStorage.setItem(key, JSON.stringify(arr));
 
+        window.dispatchEvent(new Event('fp:businesses-updated'));
+
         // 👇 одноразовый флаг для показа модалки на следующем экране
         if (!isEdit) sessionStorage.setItem('fp:show_welcome_business', '1');
 
@@ -216,13 +218,11 @@ export const Register = () => {
                                 />
 
                                 <TextField
-                                    required
                                     type="date"
                                     label="Registration Date"
                                     value={values.regDate}
                                     onChange={handle('regDate')}
-                                    error={!!errors.regDate}
-                                    helperText={errors.regDate}
+                                    InputLabelProps={{ shrink: true }}
                                     fullWidth
                                 />
 
@@ -301,17 +301,25 @@ export const Register = () => {
                                         helperText={errors.postalCode}
                                         fullWidth
                                     />
-                                    <FormControl fullWidth required error={!!errors.region}>
+                                    <FormControl
+                                        fullWidth
+                                        required
+                                        error={!!errors.region}
+                                        sx={{
+                                            // убираем "пропил" в бордере, пока лейбл не схлопнут
+                                            '& .MuiInputLabel-outlined:not(.MuiInputLabel-shrink) + .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline legend': {
+                                                width: 0,
+                                            },
+                                        }}
+                                    >
                                         <InputLabel id="region-label">Region</InputLabel>
                                         <Select
                                             labelId="region-label"
-                                            label="Region"
                                             value={values.region}
                                             onChange={handle('region') as any}
                                             displayEmpty
                                             input={<OutlinedInput label="Region" notched={false} />}
                                         >
-                                            <MenuItem value=""><em>Select your region</em></MenuItem>
                                             <MenuItem value="Anenii Noi">Anenii Noi</MenuItem>
                                             <MenuItem value="Basarabeasca">Basarabeasca</MenuItem>
                                             <MenuItem value="Briceni">Briceni</MenuItem>
@@ -347,6 +355,7 @@ export const Register = () => {
                                         </Select>
                                         {errors.region && <FormHelperText>{errors.region}</FormHelperText>}
                                     </FormControl>
+
                                 </Box>
 
                                 <TextField

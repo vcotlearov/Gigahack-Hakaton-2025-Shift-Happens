@@ -1,12 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/layout/Sidebar.tsx
 import * as React from 'react';
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
     Drawer, List, ListItemButton, ListItemIcon, ListItemText,
-    Toolbar, Box, Divider, Typography, Collapse, Paper, Button, Link as MLink
+    Toolbar, Box, Divider, Typography, Paper, Button, Link as MLink
 } from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import { Home } from '../icons/Home';
 import { Dashboard } from '../icons/Dashboard';
@@ -53,7 +52,38 @@ function NavIconBox({ active, children }: { active?: boolean; children: React.Re
 
 export default function Sidebar() {
     const { pathname } = useLocation();
-    const history = useHistory();
+
+
+    // Нормализованное чтение из localStorage
+    const readBusinesses = React.useCallback(() => {
+        try {
+            const raw = localStorage.getItem('business');
+            const parsed = raw ? JSON.parse(raw) : [];
+            setBusinesses(Array.isArray(parsed) ? parsed : [parsed]);
+        } catch {
+            setBusinesses([]);
+        }
+    }, []);
+
+    // Первичная загрузка
+    React.useEffect(() => {
+        readBusinesses();
+    }, [readBusinesses]);
+
+    // Подписка на наше кастомное событие + стандартное 'storage' (кросс-вкладки)
+    React.useEffect(() => {
+        const handler = () => readBusinesses();
+
+        // наше событие — обновляет в этой же вкладке
+        window.addEventListener('fp:businesses-updated', handler as EventListener);
+        // системное — если меняется из другой вкладки/внутреннего окна
+        window.addEventListener('storage', handler);
+
+        return () => {
+            window.removeEventListener('fp:businesses-updated', handler as EventListener);
+            window.removeEventListener('storage', handler);
+        };
+    }, [readBusinesses]);
 
     // Бизнесы из localStorage
     const [businesses, setBusinesses] = React.useState<Business[]>([]);
@@ -66,8 +96,6 @@ export default function Sidebar() {
             setBusinesses([]);
         }
     }, []);
-
-    const [openBiz, setOpenBiz] = React.useState(true);
 
     return (
         <Drawer
@@ -85,15 +113,11 @@ export default function Sidebar() {
             <Toolbar />
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <List sx={{ pt: 2 }}>
-                    {/* My Businesses + раскрывашка */}
+                    {/* My Businesses — обычный пункт, ведёт на /my-businesses */}
                     <ListItemButton
+                        component={Link as any}
+                        to={NAV_ITEMS[0].to}
                         selected={NAV_ITEMS[0].match!(pathname)}
-                        onClick={() => {
-                            setOpenBiz((v) => !v);
-                            if (!pathname.startsWith('/my-businesses') && !pathname.startsWith('/business/')) {
-                                history.push('/my-businesses');
-                            }
-                        }}
                         sx={{
                             mx: 1.5,
                             my: 0.5,
@@ -107,10 +131,10 @@ export default function Sidebar() {
                             <NavIconBox active={NAV_ITEMS[0].match!(pathname)}>{NAV_ITEMS[0].icon('currentColor')}</NavIconBox>
                         </ListItemIcon>
                         <ListItemText primary="My Businesses" primaryTypographyProps={{ fontSize: 15 }} />
-                        {openBiz ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
 
-                    <Collapse in={openBiz} timeout="auto" unmountOnExit>
+                    {/* Если есть бизнесы — показываем их ниже без коллапса */}
+                    {businesses.length > 0 && (
                         <List component="div" disablePadding>
                             {businesses.map((b, i) => {
                                 const to = `/business/${i}`;
@@ -118,7 +142,6 @@ export default function Sidebar() {
                                 return (
                                     <ListItemButton
                                         key={i}
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         component={Link as any}
                                         to={to}
                                         selected={active}
@@ -136,15 +159,14 @@ export default function Sidebar() {
                                 );
                             })}
                         </List>
-                    </Collapse>
+                    )}
 
-                    {/* Dashboard / Settings */}
+                    {/* Остальные разделы */}
                     {NAV_ITEMS.slice(1).map((item) => {
                         const isActive = item.match ? item.match(pathname) : pathname === item.to;
                         return (
                             <ListItemButton
                                 key={item.to}
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 component={Link as any}
                                 to={item.to}
                                 selected={isActive}
@@ -184,7 +206,7 @@ export default function Sidebar() {
                             Apply for discounts in our trusted partner stores.
                         </Typography>
                         <Button
-                            component={Link}
+                            component={Link as any}
                             to="/partners"
                             variant="outlined"
                             color="success"
@@ -200,25 +222,16 @@ export default function Sidebar() {
 
                 <Divider sx={{ mt: 2 }} />
 
-                {/* Footer links + копирайт */}
+                {/* Footer */}
                 <Box sx={{ px: 2, py: 1.5 }}>
-                    <MLink
-                        component={Link}
-                        to="/privacy"
-                        underline="none"
-                        sx={{ display: 'block', color: 'success.main', fontWeight: 400, mb: 1 }}
-                    >
-                        Privacy Policy
-                    </MLink>
-                    <MLink
-                        component={Link}
-                        to="/terms"
-                        underline="none"
-                        sx={{ display: 'block', color: 'success.main', fontWeight: 400, mb: 1 }}
-                    >
-                        Terms &amp; Conditions
-                    </MLink>
-
+                    <Box sx={{ display: 'flex', flexDirection: 'column', mb: 3 }}>
+                        <MLink component={Link as any} to="/privacy" underline="none" sx={{ color: 'success.main', mb: 1 }}>
+                            Privacy Policy
+                        </MLink>
+                        <MLink component={Link as any} to="/terms" underline="none" sx={{ color: 'success.main' }}>
+                            Terms &amp; Conditions
+                        </MLink>
+                    </Box>
                     <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, display: 'block', mt: 1 }}>
                         Copyright © 2025 <b>FarmProfit</b>
                         <br />

@@ -5,9 +5,9 @@ import {
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { Congrats } from '../icons/Congrats';
 
-type Props = { open: boolean; onClose: () => void };
+type Props = { open: boolean; onClose: () => void, action: () => void };
 
-export default function CongratsBusinessModal({ open, onClose }: Props) {
+export default function CongratsBusinessModal({ open, action, onClose }: Props) {
     return (
         <Dialog
             open={open}
@@ -42,14 +42,14 @@ export default function CongratsBusinessModal({ open, onClose }: Props) {
                 </Typography>
 
                 <Button
-                    onClick={onClose}
+                    onClick={action}
                     variant="contained"
                     color="success"
                     size="large"
                     fullWidth
                     sx={{ borderRadius: 2 }}
                 >
-                    Got it!
+                    Create asset
                 </Button>
             </Stack>
         </Dialog>
