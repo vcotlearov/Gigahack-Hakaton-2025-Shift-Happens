@@ -8,7 +8,7 @@ namespace FarmProfit.API.Models
 		[JsonPropertyName("userId")]
 		public Guid BusinessId { get; set; }
 		[JsonIgnore]
-		public Businesses Business { get; set; }
+		public Businesses? Business { get; set; }
 		[JsonPropertyName("email")]
 		public string Email { get; set; }
 		[JsonPropertyName("phone")]
