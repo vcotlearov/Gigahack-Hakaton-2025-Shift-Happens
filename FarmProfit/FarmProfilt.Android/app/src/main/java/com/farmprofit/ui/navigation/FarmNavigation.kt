@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
-import com.farmprofit.ui.features.dashboard.navigation.DashboardRoute
 import com.farmprofit.ui.features.dashboard.navigation.dashboardScreen
+import com.farmprofit.ui.features.home.navigation.HomeScreenRoute
+import com.farmprofit.ui.features.home.navigation.homeScreen
 import com.farmprofit.ui.features.login.navigation.loginScreen
 import com.farmprofit.ui.features.maplandselection.MapLandSelectionScreen
 import com.farmprofit.ui.features.maplandselection.navigation.LandSelectionRoute
@@ -31,7 +31,7 @@ fun FarmNavigation(
             composable<OnboardingRoute> {
                 OnboardingScreen(
                     navigateToLogin = {
-                        navController.navigate(DashboardRoute)
+                        navController.navigate(HomeScreenRoute)
                     },
 
                     )
@@ -48,5 +48,6 @@ fun FarmNavigation(
         }
 
         dashboardScreen { navController.navigate(LandSelectionRoute) }
+        homeScreen()
     }
 }

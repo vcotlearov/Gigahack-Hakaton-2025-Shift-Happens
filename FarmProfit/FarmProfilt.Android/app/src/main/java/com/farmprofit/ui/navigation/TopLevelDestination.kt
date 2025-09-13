@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.farmprofit.R
 import com.farmprofit.ui.features.dashboard.navigation.DashboardRoute
+import com.farmprofit.ui.features.home.navigation.HomeScreenRoute
 import kotlin.reflect.KClass
 
 enum class TopLevelDestination(
@@ -13,6 +14,11 @@ enum class TopLevelDestination(
     @StringRes val titleTextId: Int,
     val route: KClass<*>,
 ) {
+    HOME(
+        icon = Icons.Default.Home,
+        titleTextId = R.string.home,
+        route = HomeScreenRoute::class
+    ),
     DASHBOARD(
         icon = Icons.Default.Home,
         titleTextId = R.string.dashboard,

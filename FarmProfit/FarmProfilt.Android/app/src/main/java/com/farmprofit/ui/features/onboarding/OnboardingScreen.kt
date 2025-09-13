@@ -15,6 +15,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.farmprofit.R
 import com.farmprofit.ui.features.maplandselection.components.GoogleMapWithLocations
 import com.farmprofit.ui.theme.FarmProfitTheme
@@ -31,6 +33,8 @@ fun OnboardingScreen(
     navigateToLogin: () -> Unit = {},
     navigateToRegister: () -> Unit = {}
 ) {
+    val viewModel = hiltViewModel<OnboardingViewModel>()
+    val context = LocalContext.current
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -69,9 +73,12 @@ fun OnboardingScreen(
             )
 
             Button(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 24.dp),
-                onClick = navigateToLogin,
+                onClick = {
+                    viewModel.login(context)
+                },
                 content = { Text("Login") }
             )
 

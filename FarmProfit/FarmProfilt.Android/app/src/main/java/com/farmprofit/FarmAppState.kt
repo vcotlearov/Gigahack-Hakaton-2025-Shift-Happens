@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.farmprofit.ui.features.dashboard.navigation.navigateToDashboard
+import com.farmprofit.ui.features.home.navigation.navigateToHome
 import com.farmprofit.ui.navigation.TopLevelDestination
 import kotlin.reflect.KClass
 
@@ -62,6 +63,7 @@ class FarmAppState(
 
             when (topLevelDestination) {
                 TopLevelDestination.DASHBOARD -> navController.navigateToDashboard(topLevelNavOptions)
+                TopLevelDestination.HOME -> navController.navigateToHome(topLevelNavOptions)
             }
         }
 }

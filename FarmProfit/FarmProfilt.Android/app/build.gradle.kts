@@ -19,6 +19,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders.put("auth0Domain", "@string/com_auth0_domain")
+        manifestPlaceholders.put("auth0Scheme", "https")
     }
 
     buildTypes {
@@ -77,5 +80,10 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.layout)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.androidx.compose.material3.navigationSuite)
+
+    // auth
+    implementation(libs.auth0)
+    //datastore
+    implementation(libs.androidx.datastore.preferences)
 
 }

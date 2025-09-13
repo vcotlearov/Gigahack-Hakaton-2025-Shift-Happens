@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">FarmProfit</string>
+    <string name="com_auth0_domain">dev-iqadq0gbmsvx3bju.us.auth0.com</string>
+
     <string name="dashboard">Dashboard</string>
+    <string name="home">Home\n</string>
 </resources>
