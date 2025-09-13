@@ -27,8 +27,8 @@ namespace FarmProfit.API
             builder.Services.AddDbContext<AppDbContext>(options =>
 	            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-			var domain = builder.Configuration["Auth0:Domain"]!;
-			var audience = builder.Configuration["Auth0:Audience"]!;
+            var domain = "dev-iqadq0gbmsvx3bju.us.auth0.com";// builder.Configuration["Auth0:Domain"]!;
+            var audience = "https://farm-profit-webapp.azurewebsites.net";// builder.Configuration["Auth0:Audience"]!;
 
 			builder.Services.AddAuthentication(options =>
 				{
