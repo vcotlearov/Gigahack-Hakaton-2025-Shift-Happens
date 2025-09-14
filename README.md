@@ -1,6 +1,6 @@
-# FarmProfit – Agrihack Challenge @ GigaHack 2025
+# FarmProfit – Agrifood Challenge @ GigaHack 2025
 
-Welcome to FarmProfit, a full-stack hackathon project for the Agrihack challenge at GigaHack 2025! This repository contains a modern, production-grade web application for digital farm management, built to impress both users and judges.
+Welcome to FarmProfit, a full-stack hackathon project for the Agrifood challenge at GigaHack 2025! This repository contains a modern, MVP web application for digital farm management, built to impress both users and judges.
 
 ---
 
@@ -121,9 +121,9 @@ dotnet run
 
 ## 🤝 Team & Credits
 - Team: Shift Happens
-- Challenge: Agrihack @ GigaHack 2025
+- Challenge: Agrifood @ GigaHack 2025
 
 ---
 
 ## 💡 Inspiration
-Built for the future of digital agriculture. Good luck at GigaHack!
+Built for the future of digital agriculture. 
