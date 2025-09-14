@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/layout/Sidebar.tsx
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -24,7 +23,7 @@ const NAV_ITEMS: SidebarItem[] = [
     {
         label: 'My Businesses',
         to: '/my-businesses',
-        icon: (color) => <Home color={color} />,
+        icon: (c) => <Home color={c} />,
         match: (p) => p === '/my-businesses' || p.startsWith('/business/'),
     },
     { label: 'Dashboard', to: '/dashboard', icon: (c) => <Dashboard color={c} />, match: (p) => p.startsWith('/dashboard') },
@@ -37,11 +36,7 @@ function NavIconBox({ active, children }: { active?: boolean; children: React.Re
     return (
         <Box
             sx={{
-                width: 36,
-                height: 36,
-                borderRadius: 2,
-                display: 'grid',
-                placeItems: 'center',
+                width: 36, height: 36, borderRadius: 2, display: 'grid', placeItems: 'center',
                 color: active ? 'success.main' : 'text.secondary',
             }}
         >
@@ -53,8 +48,9 @@ function NavIconBox({ active, children }: { active?: boolean; children: React.Re
 export default function Sidebar() {
     const { pathname } = useLocation();
 
+    // 1) Состояние + чтение из LS
+    const [businesses, setBusinesses] = React.useState<Business[]>([]);
 
-    // Нормализованное чтение из localStorage
     const readBusinesses = React.useCallback(() => {
         try {
             const raw = localStorage.getItem('business');
@@ -65,75 +61,73 @@ export default function Sidebar() {
         }
     }, []);
 
-    // Первичная загрузка
+    // 2) Первичная загрузка и подписки
     React.useEffect(() => {
         readBusinesses();
-    }, [readBusinesses]);
-
-    // Подписка на наше кастомное событие + стандартное 'storage' (кросс-вкладки)
-    React.useEffect(() => {
         const handler = () => readBusinesses();
-
-        // наше событие — обновляет в этой же вкладке
         window.addEventListener('fp:businesses-updated', handler as EventListener);
-        // системное — если меняется из другой вкладки/внутреннего окна
         window.addEventListener('storage', handler);
-
         return () => {
             window.removeEventListener('fp:businesses-updated', handler as EventListener);
             window.removeEventListener('storage', handler);
         };
     }, [readBusinesses]);
 
-    // Бизнесы из localStorage
-    const [businesses, setBusinesses] = React.useState<Business[]>([]);
-    React.useEffect(() => {
-        try {
-            const raw = localStorage.getItem('business');
-            const parsed = raw ? JSON.parse(raw) : [];
-            setBusinesses(Array.isArray(parsed) ? parsed : [parsed]);
-        } catch {
-            setBusinesses([]);
-        }
-    }, []);
+    // 3) Достаём нужные айтемы по ключам — порядок задаём здесь
+    const myBizItem = NAV_ITEMS.find(i => i.to === '/my-businesses')!;
+    const dashItem = NAV_ITEMS.find(i => i.to === '/dashboard')!;
+    const setItem = NAV_ITEMS.find(i => i.to === '/settings')!;
 
     return (
         <Drawer
             variant="permanent"
             sx={{
-                width: drawerWidth,
-                flexShrink: 0,
-                '& .MuiDrawer-paper': {
-                    width: drawerWidth,
-                    boxSizing: 'border-box',
-                    borderRight: '1px solid #eee',
-                },
+                width: drawerWidth, flexShrink: 0,
+                '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', borderRight: '1px solid #eee' },
             }}
         >
             <Toolbar />
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <List sx={{ pt: 2 }}>
-                    {/* My Businesses — обычный пункт, ведёт на /my-businesses */}
+                    {/* --- 1) DASHBOARD --- */}
                     <ListItemButton
                         component={Link as any}
-                        to={NAV_ITEMS[0].to}
-                        selected={NAV_ITEMS[0].match!(pathname)}
+                        to={dashItem.to}
+                        selected={dashItem.match ? dashItem.match(pathname) : pathname === dashItem.to}
                         sx={{
-                            mx: 1.5,
-                            my: 0.5,
-                            borderRadius: 1,
-                            px: 1.25,
+                            mx: 1.5, my: 0.5, borderRadius: 1, px: 1.25,
                             '&.Mui-selected': { backgroundColor: 'rgba(22,163,74,0.12)' },
                             '&.Mui-selected .MuiListItemText-primary': { color: 'success.main', fontWeight: 600 },
                         }}
                     >
                         <ListItemIcon sx={{ minWidth: 44 }}>
-                            <NavIconBox active={NAV_ITEMS[0].match!(pathname)}>{NAV_ITEMS[0].icon('currentColor')}</NavIconBox>
+                            <NavIconBox active={dashItem.match ? dashItem.match(pathname) : pathname === dashItem.to}>
+                                {dashItem.icon('currentColor')}
+                            </NavIconBox>
                         </ListItemIcon>
-                        <ListItemText primary="My Businesses" primaryTypographyProps={{ fontSize: 15 }} />
+                        <ListItemText primary={dashItem.label} primaryTypographyProps={{ fontSize: 15 }} />
                     </ListItemButton>
 
-                    {/* Если есть бизнесы — показываем их ниже без коллапса */}
+                    {/* --- 2) MY BUSINESSES --- */}
+                    <ListItemButton
+                        component={Link as any}
+                        to={myBizItem.to}
+                        selected={myBizItem.match ? myBizItem.match(pathname) : pathname === myBizItem.to}
+                        sx={{
+                            mx: 1.5, my: 0.5, borderRadius: 1, px: 1.25,
+                            '&.Mui-selected': { backgroundColor: 'rgba(22,163,74,0.12)' },
+                            '&.Mui-selected .MuiListItemText-primary': { color: 'success.main', fontWeight: 600 },
+                        }}
+                    >
+                        <ListItemIcon sx={{ minWidth: 44 }}>
+                            <NavIconBox active={myBizItem.match ? myBizItem.match(pathname) : pathname === myBizItem.to}>
+                                {myBizItem.icon('currentColor')}
+                            </NavIconBox>
+                        </ListItemIcon>
+                        <ListItemText primary={myBizItem.label} primaryTypographyProps={{ fontSize: 15 }} />
+                    </ListItemButton>
+
+                    {/* список бизнесов без коллапса */}
                     {businesses.length > 0 && (
                         <List component="div" disablePadding>
                             {businesses.map((b, i) => {
@@ -146,10 +140,7 @@ export default function Sidebar() {
                                         to={to}
                                         selected={active}
                                         sx={{
-                                            mx: 1.5,
-                                            mb: 0.5,
-                                            ml: 5,
-                                            borderRadius: 1,
+                                            mx: 1.5, mb: .5, ml: 5, borderRadius: 1,
                                             '&.Mui-selected': { backgroundColor: 'rgba(22,163,74,0.08)' },
                                             '& .MuiListItemText-primary': { fontSize: 14 },
                                         }}
@@ -161,65 +152,40 @@ export default function Sidebar() {
                         </List>
                     )}
 
-                    {/* Остальные разделы */}
-                    {NAV_ITEMS.slice(1).map((item) => {
-                        const isActive = item.match ? item.match(pathname) : pathname === item.to;
-                        return (
-                            <ListItemButton
-                                key={item.to}
-                                component={Link as any}
-                                to={item.to}
-                                selected={isActive}
-                                sx={{
-                                    mx: 1.5,
-                                    my: 0.5,
-                                    borderRadius: 1,
-                                    px: 1.25,
-                                    '&.Mui-selected': { backgroundColor: 'rgba(22,163,74,0.12)' },
-                                    '&.Mui-selected .MuiListItemText-primary': { color: 'success.main', fontWeight: 600 },
-                                }}
-                            >
-                                <ListItemIcon sx={{ minWidth: 44 }}>
-                                    <NavIconBox active={isActive}>{item.icon('currentColor')}</NavIconBox>
-                                </ListItemIcon>
-                                <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 15 }} />
-                            </ListItemButton>
-                        );
-                    })}
-                </List>
-
-                {/* CTA карточка Explore Partners */}
-                <Box sx={{ px: 2, mt: 1.5 }}>
-                    <Paper
-                        variant="outlined"
+                    {/* --- 3) SETTINGS --- */}
+                    <ListItemButton
+                        component={Link as any}
+                        to={setItem.to}
+                        selected={setItem.match ? setItem.match(pathname) : pathname === setItem.to}
                         sx={{
-                            p: 2,
-                            borderRadius: 2,
-                            bgcolor: (t) => t.palette.grey[100],
-                            borderColor: (t) => t.palette.grey[200],
+                            mx: 1.5, my: 0.5, borderRadius: 1, px: 1.25,
+                            '&.Mui-selected': { backgroundColor: 'rgba(22,163,74,0.12)' },
+                            '&.Mui-selected .MuiListItemText-primary': { color: 'success.main', fontWeight: 600 },
                         }}
                     >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
-                            Explore Reward Options
-                        </Typography>
+                        <ListItemIcon sx={{ minWidth: 44 }}>
+                            <NavIconBox active={setItem.match ? setItem.match(pathname) : pathname === setItem.to}>
+                                {setItem.icon('currentColor')}
+                            </NavIconBox>
+                        </ListItemIcon>
+                        <ListItemText primary={setItem.label} primaryTypographyProps={{ fontSize: 15 }} />
+                    </ListItemButton>
+                </List>
+
+                {/* CTA карточка */}
+                <Box sx={{ px: 2, mt: 1.5 }}>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: (t) => t.palette.grey[100], borderColor: (t) => t.palette.grey[200] }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>Explore Reward Options</Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
                             Apply for discounts in our trusted partner stores.
                         </Typography>
-                        <Button
-                            component={Link as any}
-                            to="/partners"
-                            variant="outlined"
-                            color="success"
-                            fullWidth
-                            sx={{ borderRadius: 2, fontWeight: 600 }}
-                        >
+                        <Button component={Link as any} to="/partners" variant="outlined" color="success" fullWidth sx={{ borderRadius: 2, fontWeight: 600 }}>
                             Explore Partners
                         </Button>
                     </Paper>
                 </Box>
 
                 <Box sx={{ flexGrow: 1 }} />
-
                 <Divider sx={{ mt: 2 }} />
 
                 {/* Footer */}
