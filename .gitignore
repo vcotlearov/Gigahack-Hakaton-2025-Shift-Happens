@@ -2,6 +2,7 @@
 /FarmProfit/FarmProfit.API/obj
 /FarmProfit/FarmProfit.API/bin
 FarmProfit/FarmProfit.API/Logs/log.txt
+node_modules
 FarmProfit/FarmProfilt.Android/.kotlin/errors/errors-1757702652731.log
 FarmProfit/FarmProfilt.Android/.kotlin/errors/errors-1757702682075.log
 FarmProfit/FarmProfilt.Android/.kotlin/errors/errors-1757703155822.log
