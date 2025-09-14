@@ -13,7 +13,12 @@ export const Header = () => {
                 </Box>
                 <Box display='flex' alignItems='center' gap={1}>
                     <Avatar>JD</Avatar>
-                    <MenuItem onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+                    <MenuItem onClick={() => {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        logout({ logoutParams: { returnTo: window.location.origin } });
+
+                    }}>
                         Log out
                     </MenuItem>
                 </Box>

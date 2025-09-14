@@ -49,7 +49,7 @@ export default function WelcomeCard() {
 
                 <Stack alignItems="center" textAlign="center" spacing={2} mb={3} mt={3}>
                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                        Welcome to FarmProfit!
+                        Welcome!
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                         Your farm. Your data. Your rewards.
