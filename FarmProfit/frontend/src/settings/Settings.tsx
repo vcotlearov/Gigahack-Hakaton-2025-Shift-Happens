@@ -101,7 +101,7 @@ export default function Settings() {
                     control={<Checkbox disabled checked={true} color="success" onChange={toggle('aipa')} />}
                     label={
                         <Typography sx={{ fontWeight: 600 }}>
-                            <MLink href="#" underline="hover">AIPA</MLink>
+                            <MLink href="https://aipa.gov.md/" underline="hover">AIPA</MLink>
                         </Typography>
                     }
                 />
@@ -116,7 +116,7 @@ export default function Settings() {
                     control={<Checkbox disabled checked={true} color="success" onChange={toggle('moa')} />}
                     label={
                         <Typography sx={{ fontWeight: 600 }}>
-                            <MLink href="#" underline="hover">Ministry of Agriculture</MLink>
+                            <MLink href="https://maia.gov.md/" underline="hover">Ministry of Agriculture</MLink>
                         </Typography>
                     }
                 />

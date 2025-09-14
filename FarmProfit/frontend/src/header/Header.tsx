@@ -10,7 +10,6 @@ export const Header = () => {
             <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ padding: '16px 24px' }}>
                 <Box display="flex" alignItems="center" gap={3}>
                     <Logo />
-
                 </Box>
                 <Box display='flex' alignItems='center' gap={1}>
                     <Avatar>JD</Avatar>
