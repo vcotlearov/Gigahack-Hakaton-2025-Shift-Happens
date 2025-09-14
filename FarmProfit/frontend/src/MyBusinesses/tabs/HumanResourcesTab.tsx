@@ -144,7 +144,7 @@ function IndividualDialog({
 
 /* -------------------- Card -------------------- */
 function HrCard({
-    item, onEdit, onRemove
+    item, onRemove
 }: {
     item: HrItem;
     onEdit: () => void;

@@ -5,11 +5,9 @@ import {
     Stack,
     Typography,
     Paper,
-    Divider,
     Chip,
     Button,
     IconButton,
-    Tooltip,
     Link as MLink,
     Menu,
     MenuItem,
@@ -19,11 +17,13 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useHistory, useParams } from 'react-router-dom';
 import RepresentativesTab from './tabs/RepresentativesTab';
 import HumanResourcesTab from './tabs/HumanResourcesTab';
 import { useLsCount } from './useLsCounts';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 
 // --------- Types (синхронно с твоими) ----------
 export type Business = {
@@ -174,6 +174,178 @@ function AssetCard({ a }: { a: Asset }) {
     );
 }
 
+// мягкое чтение массивов из localStorage
+function readArray<T = any>(key: string): T[] {
+    try {
+        const raw = localStorage.getItem(key);
+        const v = raw ? JSON.parse(raw) : [];
+        return Array.isArray(v) ? v : [];
+    } catch {
+        return [];
+    }
+}
+
+// пробуем найти логотип и превратить его в dataURL (png)
+async function tryLoadLogoDataUrl() {
+    const candidates = ['/logo.png', '/logo512.png', '/logo.svg'];
+    for (const url of candidates) {
+        try {
+            const dataUrl = await imgToDataUrl(url);
+            if (dataUrl) return dataUrl;
+        } catch { /* noop */ }
+    }
+    return null;
+}
+function imgToDataUrl(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return reject(new Error('no ctx'));
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
+
+// основной экспорт в PDF
+async function exportBusinessPdf(idx: number, business: Business | null, assets: Asset[]) {
+    // helpers
+    const fmtDate = (v?: string) =>
+        v ? new Date(v).toLocaleDateString() : '';
+    const n = (v?: number | string) =>
+        (v ?? '') === '' ? '' : String(v);
+
+    const hr = readArray<any>(`hr:${idx}`);
+    const reps = readArray<any>(`reps:${idx}`);
+
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+
+    // поля страницы
+    const LM = 40, RM = 40, TM = 120, BM = 60;
+    let cursor = TM;
+
+    // header (логотип, название, служебная инфа)
+    try {
+        const logo = await tryLoadLogoDataUrl();
+        if (logo) doc.addImage(logo, 'PNG', LM, 40, 120, 40);
+    } catch { console.warn('Failed to load logo'); }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text(business?.businessName || 'Business', LM, 85);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, LM, 102);
+    doc.text(`Total Balance: 1000 lei`, LM, 118);
+    doc.setTextColor(0);
+
+    // утилита для заголовков/секций
+    const sectionTitle = (title: string) => {
+        // новая страница если не помещается заголовок + хотя бы одна строка
+        if (cursor > pageH - BM - 40) { doc.addPage(); cursor = TM; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+        doc.text(title, LM, cursor);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+        cursor += 16;
+    };
+    const runTable = (cfg: any) => {
+        autoTable(doc, {
+            startY: cursor + 6,
+            margin: { left: LM, right: RM },
+            styles: { fontSize: 10, cellPadding: 6 },
+            theme: 'grid',
+            ...cfg,
+        } as any);
+        // курсор после таблицы
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        cursor = (doc as any).lastAutoTable.finalY + 24;
+    };
+
+    // Business details
+    sectionTitle('Business Details');
+    runTable({
+        head: [['Field', 'Value']],
+        headStyles: { fillColor: [22, 163, 74], textColor: 255 },
+        body: [
+            ['IDNO', business?.idno ?? ''],
+            ['Legal form', business?.legalForm ?? ''],
+            ['Registration date', fmtDate(business?.registrationDate)],
+            ['Region', business?.contact?.region ?? ''],
+            ['Email', business?.contact?.email ?? ''],
+            ['Phone', business?.contact?.phone ?? ''],
+            ['Address', business?.contact?.address ?? ''],
+            ['Postal code', business?.contact?.postalCode ?? ''],
+        ],
+    });
+
+    // Assets
+    sectionTitle(`Assets (${assets.length})`);
+    runTable({
+        head: [['Name', 'Type', 'Area (ha)', 'Owned (ha)', 'Leased (ha)', 'In Use (ha)', 'Cadastral']],
+        headStyles: { fillColor: [240, 240, 240], textColor: 20 },
+        body: assets.length
+            ? assets.map(a => [
+                a.name ?? '',
+                a.type === 'crops' ? 'Crops' : a.type === 'land' ? 'Land' : (a.type ?? ''),
+                n(a.areaHa),
+                n(a.ownedHa ?? a.areaHa),
+                n(a.leasedHa),
+                n(a.inUseHa ?? Math.max(0, (a.areaHa ?? 0) - (a.leasedHa ?? 0))),
+                a.cadastral ?? '',
+            ])
+            : [['No assets yet', '', '', '', '', '', '']],
+    });
+
+    // Human Resources
+    sectionTitle(`Human Resources (${hr.length})`);
+    runTable({
+        head: [['Full Name', 'Gender', 'Role', 'Employment Type', 'Date Added']],
+        headStyles: { fillColor: [240, 240, 240], textColor: 20 },
+        body: hr.length
+            ? hr.map((p: any) => [
+                p.fullName ?? p.name ?? '',
+                p.gender ?? '',
+                p.role ?? '',
+                p.employmentType ?? p.type ?? '',
+                fmtDate(p.dateAdded ?? p.date),
+            ])
+            : [['No human resources yet', '', '', '', '']],
+    });
+
+    // Representatives
+    sectionTitle(`Representatives (${reps.length})`);
+    runTable({
+        head: [['Email', 'Invitation Status', 'Invitation Date']],
+        headStyles: { fillColor: [240, 240, 240], textColor: 20 },
+        body: reps.length
+            ? reps.map((r: any) => [
+                r.email ?? '',
+                r.status ?? r.invitationStatus ?? '',
+                fmtDate(r.date ?? r.invitationDate),
+            ])
+            : [['No representatives yet', '', '']],
+    });
+
+    // footer with page numbers
+    const total = doc.getNumberOfPages();
+    for (let i = 1; i <= total; i++) {
+        doc.setPage(i);
+        doc.setFontSize(9); doc.setTextColor(120);
+        doc.text(`FarmProfit — ${new Date().toLocaleDateString()} — Page ${i}/${total}`,
+            pageW - RM, pageH - 24, { align: 'right' });
+    }
+    doc.save(`FarmProfit_Business_${idx}.pdf`);
+}
+
+
 // ---------- Page ----------
 export default function BusinessDetails() {
     const { index } = useParams<{ index: string }>();
@@ -193,7 +365,7 @@ export default function BusinessDetails() {
     const [expEl, setExpEl] = React.useState<null | HTMLElement>(null);
     const expOpen = Boolean(expEl);
 
-    const onExport = (fmt: 'csv' | 'json' | 'geojson') => {
+    const onExport = async (fmt: 'csv' | 'json' | 'geojson' | 'pdf') => {
         setExpEl(null);
         if (fmt === 'json') {
             download(`business-${idx}-assets.json`, JSON.stringify(assets, null, 2), 'application/json');
@@ -223,8 +395,13 @@ export default function BusinessDetails() {
                 }));
             const fc = { type: 'FeatureCollection', features };
             download(`business-${idx}-assets.geojson`, JSON.stringify(fc, null, 2), 'application/geo+json');
+            return;
+        }
+        if (fmt === 'pdf') {
+            await exportBusinessPdf(idx, business, assets);   // ← новый
         }
     };
+
 
     return (
         <Box sx={{ px: 6, py: 3 }}>
@@ -261,6 +438,7 @@ export default function BusinessDetails() {
                         <MenuItem onClick={() => onExport('csv')}>CSV</MenuItem>
                         <MenuItem onClick={() => onExport('json')}>JSON</MenuItem>
                         <MenuItem onClick={() => onExport('geojson')}>GeoJSON</MenuItem>
+                        <MenuItem onClick={() => onExport('pdf')}>PDF</MenuItem> {/* ← новый */}
                     </Menu>
 
 
