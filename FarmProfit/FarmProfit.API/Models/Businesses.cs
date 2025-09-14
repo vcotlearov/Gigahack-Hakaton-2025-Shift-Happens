@@ -13,6 +13,7 @@ public class Businesses
 
 	public Contacts Contract { get; set; }
 	public ICollection<Parcel> Parcels { get; set; } = new List<Parcel>();
+	public ICollection<Employees> Employees { get; set; } = new List<Employees>();
 }
 
 public class BusinessDto

@@ -22,7 +22,7 @@ public class BusinessController(AppDbContext db, ILogger<BusinessController> log
 
 			var businessList = await db.Businesses
 				.Include(b => b.Contract)
-				.Where(u => u.UserId == employee.Id)
+				.Where(u => u.UserId == employee.Id || u.Employees.Select(x=>x.Id).Contains(employee.Id))
 				.Select(s => ConvertBusinessToDto(s))
 				.ToListAsync();
 

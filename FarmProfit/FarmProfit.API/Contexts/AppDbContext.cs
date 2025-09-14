@@ -8,6 +8,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<Businesses> Businesses { get; set; }
 	public DbSet<Contacts> Contacts { get; set; }
 	public DbSet<Parcel> Parcels { get; set; }
+	public DbSet<Invitations> Invitations { get; set; }
+	public DbSet<Employees> Employees{ get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -49,5 +51,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.WithMany(b => b.Parcels)
 			.HasForeignKey(p => p.BusinessId)
 			.OnDelete(DeleteBehavior.Cascade);
+
+		modelBuilder.Entity<Employees>()
+			.HasMany(e => e.Businesses)
+			.WithMany(b => b.Employees)
+			.UsingEntity(j => j.ToTable("EmployeeBusiness"));
 	}
 }
