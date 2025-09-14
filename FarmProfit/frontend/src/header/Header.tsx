@@ -14,8 +14,6 @@ export const Header = () => {
                 <Box display='flex' alignItems='center' gap={1}>
                     <Avatar>JD</Avatar>
                     <MenuItem onClick={() => {
-                        localStorage.clear();
-                        sessionStorage.clear();
                         logout({ logoutParams: { returnTo: window.location.origin } });
 
                     }}>
