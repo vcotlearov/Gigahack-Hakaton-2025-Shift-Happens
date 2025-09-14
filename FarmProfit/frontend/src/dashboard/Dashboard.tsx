@@ -16,9 +16,9 @@ type RegionStat = {
 };
 
 const MY_STATS = {
-    businesses: 2,
-    subsidies: 40,
-    discountsMdl: 7356,
+    businesses: 1,
+    subsidies: 0,
+    discountsMdl: 1100,
 };
 
 const MD_STATS = {
