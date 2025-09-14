@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">FarmProfit</string>
+    <string name="com_auth0_domain">dev-iqadq0gbmsvx3bju.us.auth0.com</string>
+    <string name="com_auth0_scheme">demo</string>
+
+    <string name="dashboard">Dashboard</string>
+    <string name="home">Home</string>
+    <string name="partners">Partners</string>
+    <string name="registration_date">Registration date: %s</string>
+    <string name="idno">IDNO: </string>
+    <string name="active_assets">Active assets: </string>
+    <string name="current_balance">Current balance: </string>
+
+    <string name="scan_qr_code_instructions">Scan the QR code at a partner store to use your balance.\nIf the scan doesn’t work, you can enter the code manually.</string>
+</resources>
