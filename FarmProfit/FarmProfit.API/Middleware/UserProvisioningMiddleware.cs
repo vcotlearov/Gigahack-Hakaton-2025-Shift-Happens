@@ -11,7 +11,7 @@ namespace FarmProfit.API.Middleware
 		{
 			if (context.User.Identity?.IsAuthenticated == true)
 			{
-				var sub = context.User.FindFirst("sub")?.Value;
+				var sub = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 				var email = context.User.FindFirst(ClaimTypes.Email)?.Value;
 
 				if (!string.IsNullOrEmpty(sub))
@@ -19,20 +19,21 @@ namespace FarmProfit.API.Middleware
 					var user = await db.Users.FirstOrDefaultAsync(u => u.Auth0Id == sub);
 					if (user == null)
 					{
-						db.Users.Add(new User
+						user = new User
 						{
 							Auth0Id = sub,
-							Email = email ?? "unknown@example.com",
+							Email = email ?? "unknown@farmprofit",
 							CreatedAt = DateTime.UtcNow
-						});
+						};
+						db.Users.Add(user);
 					}
 					else
 					{
-						// update last login timestamp
 						user.LastLoginAt = DateTime.UtcNow;
 					}
 
 					await db.SaveChangesAsync();
+					context.Items["Employee"] = user;
 				}
 			}
 
