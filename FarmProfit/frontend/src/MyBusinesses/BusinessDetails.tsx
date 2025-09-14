@@ -23,6 +23,7 @@ import HumanResourcesTab from './tabs/HumanResourcesTab';
 import { useLsCount } from './useLsCounts';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import CongratsAssetModal from '../modals/CongratsAssetModal';
 
 
 // --------- Types (синхронно с твоими) ----------
@@ -352,6 +353,15 @@ export default function BusinessDetails() {
     const idx = Number(index || 0);
     const history = useHistory();
 
+    const [showAssetCongrats, setShowAssetCongrats] = React.useState(false);
+
+    React.useEffect(() => {
+        if (sessionStorage.getItem('fp:show_welcome_asset') === '1') {
+            setShowAssetCongrats(true);
+            sessionStorage.removeItem('fp:show_welcome_asset');
+        }
+    }, []);
+
     const hrCount = useLsCount(`hr:${idx}`, ['fp:hr-updated']);
     const repsCount = useLsCount(`reps:${idx}`, ['fp:reps-updated']);
 
@@ -459,6 +469,8 @@ export default function BusinessDetails() {
                     <Tab label={`Assets (${assets.length})`} />
                     <Tab label={`Human Resources (${hrCount})`} />
                     <Tab label={`Representatives (${repsCount})`} />
+                    <Tab label={`Subsidies (4)`} />
+                    <Tab label={`Notes (12)`} />
                 </Tabs>
             </Box>
 
@@ -517,7 +529,14 @@ export default function BusinessDetails() {
                 // </Paper>
                 <RepresentativesTab businessIndex={idx} />
             )}
-
+            <CongratsAssetModal
+                open={showAssetCongrats}
+                onClose={() => setShowAssetCongrats(false)}
+                onExplore={() => {
+                    setShowAssetCongrats(false);
+                    history.push('/partners');
+                }}
+            />
         </Box>
     );
 }

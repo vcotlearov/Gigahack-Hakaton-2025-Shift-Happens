@@ -1,21 +1,22 @@
-
 import * as React from 'react';
 import {
-    Box, Stack, Paper, Typography, Button, Chip,
-    IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent,
-    DialogActions, TextField, Tooltip
+    Box, Stack, Paper, Typography, Button,
+    IconButton, Menu, MenuItem, Dialog, DialogTitle,
+    DialogContent, DialogActions, TextField, Tooltip
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
 
-type RepStatus = 'Pending' | 'Accepted' | 'Revoked';
 type Rep = {
     id: string;
     email: string;
-    status: RepStatus;
     invitedAt: string; // ISO
 };
 
-const uid = () => (globalThis.crypto?.randomUUID?.() ?? `id-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+const uid = () =>
+(globalThis.crypto?.randomUUID?.() ??
+    `id-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
 const fmtDate = (iso: string) => {
     const d = new Date(iso);
     const dd = String(d.getDate()).padStart(2, '0');
@@ -31,17 +32,28 @@ function useReps(index: number) {
     const load = React.useCallback(() => {
         try {
             const raw = localStorage.getItem(key);
-            const arr = raw ? JSON.parse(raw) as Rep[] : [];
-            setReps(Array.isArray(arr) ? arr : []);
-        } catch { setReps([]); }
+            const arr = raw ? (JSON.parse(raw) as any[]) : [];
+            const normalized: Rep[] = (Array.isArray(arr) ? arr : [])
+                .map((r) => ({
+                    id: r?.id ?? uid(),
+                    email: r?.email ?? '',
+                    invitedAt: r?.invitedAt ?? r?.date ?? new Date().toISOString(),
+                }))
+                .filter((r) => !!r.email);
+            setReps(normalized);
+        } catch {
+            setReps([]);
+        }
     }, [key]);
 
-    const save = React.useCallback((next: Rep[]) => {
-        localStorage.setItem(key, JSON.stringify(next));
-        setReps(next);
-        // если нужно, уведомим другие компоненты
-        window.dispatchEvent(new Event('fp:reps-updated'));
-    }, [key]);
+    const save = React.useCallback(
+        (next: Rep[]) => {
+            localStorage.setItem(key, JSON.stringify(next));
+            setReps(next);
+            window.dispatchEvent(new Event('fp:reps-updated'));
+        },
+        [key]
+    );
 
     React.useEffect(() => {
         load();
@@ -57,21 +69,24 @@ function useReps(index: number) {
     return { reps, save };
 }
 
-function statusChip(status: RepStatus) {
-    if (status === 'Accepted') return <Chip label="Accepted" color="success" size="small" variant="outlined" />;
-    if (status === 'Revoked') return <Chip label="Revoked" color="error" size="small" variant="outlined" />;
-    return <Chip label="Pending" color="secondary" size="small" variant="outlined" />;
-}
-
 function InviteDialog({
-    open, onClose, onSubmit
-}: { open: boolean; onClose: () => void; onSubmit: (email: string) => void }) {
+    open,
+    onClose,
+    onSubmit,
+}: {
+    open: boolean;
+    onClose: () => void;
+    onSubmit: (email: string) => void;
+}) {
     const [email, setEmail] = React.useState('');
     const [err, setErr] = React.useState('');
 
     const submit = () => {
         const ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim());
-        if (!ok) { setErr('Enter a valid email'); return; }
+        if (!ok) {
+            setErr('Enter a valid email');
+            return;
+        }
         onSubmit(email.trim());
         setEmail('');
         setErr('');
@@ -94,37 +109,46 @@ function InviteDialog({
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="inherit">Cancel</Button>
-                <Button onClick={submit} variant="contained" color="success">Send Invite</Button>
+                <Button onClick={onClose} color="inherit">
+                    Cancel
+                </Button>
+                <Button onClick={submit} variant="contained" color="success">
+                    Send Invite
+                </Button>
             </DialogActions>
         </Dialog>
     );
 }
 
-export default function RepresentativesTab({ businessIndex }: { businessIndex: number }) {
+export default function RepresentativesTab({
+    businessIndex,
+}: {
+    businessIndex: number;
+}) {
     const { reps, save } = useReps(businessIndex);
     const [inviteOpen, setInviteOpen] = React.useState(false);
 
     const addRep = (email: string) => {
         const next: Rep[] = [
             ...reps,
-            { id: uid(), email, status: 'Pending', invitedAt: new Date().toISOString() },
+            { id: uid(), email, invitedAt: new Date().toISOString() },
         ];
         save(next);
         setInviteOpen(false);
     };
 
-    const updateStatus = (id: string, status: RepStatus) => {
-        save(reps.map(r => r.id === id ? { ...r, status } : r));
-    };
-
-    const removeRep = (id: string) => save(reps.filter(r => r.id !== id));
+    const removeRep = (id: string) => save(reps.filter((r) => r.id !== id));
 
     return (
         <Box>
-            {/* top bar inside tab */}
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+            <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ mb: 2 }}
+            >
                 <Button
+                    startIcon={<AddRoundedIcon />}
                     variant="contained"
                     color="success"
                     sx={{ borderRadius: 999, px: 2.5 }}
@@ -134,11 +158,11 @@ export default function RepresentativesTab({ businessIndex }: { businessIndex: n
                 </Button>
             </Stack>
 
-            {/* cards */}
             {reps.length === 0 ? (
                 <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
                     <Typography color="text.secondary">
-                        You don’t have representatives yet. Invite a person using the button above.
+                        You don’t have representatives yet. Invite a person using the button
+                        above.
                     </Typography>
                 </Paper>
             ) : (
@@ -153,33 +177,43 @@ export default function RepresentativesTab({ businessIndex }: { businessIndex: n
                         <RepCard
                             key={r.id}
                             rep={r}
-                            onAccept={() => updateStatus(r.id, 'Accepted')}
-                            onMarkPending={() => updateStatus(r.id, 'Pending')}
-                            onRevoke={() => updateStatus(r.id, 'Revoked')}
                             onRemove={() => removeRep(r.id)}
-                            inviteLink={`${window.location.origin}/accept-invite?biz=${businessIndex}&email=${encodeURIComponent(r.email)}`}
+                            inviteLink={`${window.location.origin}/accept-invite?biz=${businessIndex}&email=${encodeURIComponent(
+                                r.email
+                            )}`}
                         />
                     ))}
                 </Box>
             )}
 
-            <InviteDialog open={inviteOpen} onClose={() => setInviteOpen(false)} onSubmit={addRep} />
+            <InviteDialog
+                open={inviteOpen}
+                onClose={() => setInviteOpen(false)}
+                onSubmit={addRep}
+            />
         </Box>
     );
 }
 
 function RepCard({
-    rep, onAccept, onMarkPending, onRevoke, onRemove
+    rep,
+    onRemove,
+    inviteLink,
 }: {
     rep: Rep;
-    onAccept: () => void;
-    onMarkPending: () => void;
-    onRevoke: () => void;
     onRemove: () => void;
     inviteLink: string;
 }) {
     const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchor);
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(inviteLink);
+        } catch {
+            /* no-op */
+        }
+    };
 
     return (
         <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, position: 'relative' }}>
@@ -199,10 +233,21 @@ function RepCard({
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             >
-                <MenuItem onClick={() => { onAccept(); setAnchor(null); }}>Mark as accepted</MenuItem>
-                <MenuItem onClick={() => { onMarkPending(); setAnchor(null); }}>Mark as pending</MenuItem>
-                <MenuItem onClick={() => { onRevoke(); setAnchor(null); }}>Revoke access</MenuItem>
-                <MenuItem onClick={() => { onRemove(); setAnchor(null); }} style={{ color: '#d32f2f' }}>
+                <MenuItem
+                    onClick={() => {
+                        copyLink();
+                        setAnchor(null);
+                    }}
+                >
+                    Copy invite link
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        onRemove();
+                        setAnchor(null);
+                    }}
+                    style={{ color: '#d32f2f' }}
+                >
                     Remove
                 </MenuItem>
             </Menu>
@@ -211,15 +256,14 @@ function RepCard({
                 {rep.email}
             </Typography>
 
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>Invitation Status:</Typography>
-                {statusChip(rep.status)}
-            </Stack>
-
             <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>Invitation Date:</Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Invitation Date:
+                </Typography>
                 <Tooltip title={rep.invitedAt}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{fmtDate(rep.invitedAt)}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {fmtDate(rep.invitedAt)}
+                    </Typography>
                 </Tooltip>
             </Stack>
         </Paper>

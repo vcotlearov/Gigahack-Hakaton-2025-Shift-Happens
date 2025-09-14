@@ -64,7 +64,6 @@ export default function CreateCropsAsset() {
         arr.push(asset);
         localStorage.setItem(key, JSON.stringify(arr));
         sessionStorage.setItem('fp:show_welcome_asset', '1');
-
         history.push(`/business/${index}`); // теперь ведём на новую страницу
     };
 

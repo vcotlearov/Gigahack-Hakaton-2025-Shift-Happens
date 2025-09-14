@@ -11,8 +11,8 @@ import BusinessDetails from './MyBusinesses/BusinessDetails';
 import BusinessOverview from './MyBusinesses/BusinessOverview';
 import { MyBusinesses } from './MyBusinesses/MyBusinesses';
 import Settings from './settings/Settings';
-import { Dashboard } from './dashboard/Dashboard';
 import Partners from './partners/Partners';
+import Dashboard from './dashboard/Dashboard';
 
 
 function ProtectedApp() {
