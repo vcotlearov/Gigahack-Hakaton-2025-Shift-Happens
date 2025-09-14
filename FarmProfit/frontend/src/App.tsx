@@ -11,6 +11,8 @@ import BusinessDetails from './MyBusinesses/BusinessDetails';
 import BusinessOverview from './MyBusinesses/BusinessOverview';
 import { MyBusinesses } from './MyBusinesses/MyBusinesses';
 import Settings from './settings/Settings';
+import Partners from './partners/Partners';
+
 
 function ProtectedApp() {
   return (
@@ -23,6 +25,7 @@ function ProtectedApp() {
         <Route exact path="/business/:index/assets/new" component={BusinessOverview} />
         <Route exact path="/business/:index/assets/new/land" component={CreateCropsAsset} />
         <Route path="/settings" exact component={Settings} />
+        <Route path="/partners" exact component={Partners} />
 
       </Switch>
     </Layout>

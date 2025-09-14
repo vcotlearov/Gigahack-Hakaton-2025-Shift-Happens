@@ -123,7 +123,7 @@ export default function BusinessDetails() {
                         {business?.businessName || 'Business'}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        Total Balance: 1000 lei · <MLink href="#" underline="hover">Explore Partners →</MLink>
+                        Total Balance: 1000 lei · <MLink href="/partners" underline="hover">Explore Partners →</MLink>
                     </Typography>
                 </Stack>
 
